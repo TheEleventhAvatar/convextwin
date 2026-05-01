@@ -1,0 +1,23 @@
+{
+  "version": "1.0.0",
+  "timestamp": "2026-05-01T18:25:12.592Z",
+  "tables": {
+    "users": [
+      {
+        "_id": "user_123",
+        "_creationTime": 1777659912593,
+        "name": "John Doe",
+        "email": "john@example.com"
+      }
+    ],
+    "messages": [
+      {
+        "_id": "msg_456",
+        "_creationTime": 1777659912593,
+        "userId": "user_123",
+        "text": "Hello, world!",
+        "channel": "general"
+      }
+    ]
+  }
+}

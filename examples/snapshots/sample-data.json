@@ -1,0 +1,71 @@
+{
+  "version": "1.0.0",
+  "timestamp": "2024-01-15T10:30:00.000Z",
+  "tables": {
+    "users": [
+      {
+        "_id": "user_123",
+        "_creationTime": 1705314600000,
+        "name": "Alice Johnson",
+        "email": "alice@example.com",
+        "createdAt": 1705314600000
+      },
+      {
+        "_id": "user_456",
+        "_creationTime": 1705314700000,
+        "name": "Bob Smith",
+        "email": "bob@example.com",
+        "createdAt": 1705314700000
+      },
+      {
+        "_id": "user_789",
+        "_creationTime": 1705314800000,
+        "name": "Carol Davis",
+        "email": "carol@example.com",
+        "createdAt": 1705314800000
+      }
+    ],
+    "messages": [
+      {
+        "_id": "msg_001",
+        "_creationTime": 1705315000000,
+        "userId": "user_123",
+        "text": "Hello everyone!",
+        "channel": "general",
+        "createdAt": 1705315000000
+      },
+      {
+        "_id": "msg_002",
+        "_creationTime": 1705315100000,
+        "userId": "user_456",
+        "text": "Hi Alice! How are you?",
+        "channel": "general",
+        "createdAt": 1705315100000
+      },
+      {
+        "_id": "msg_003",
+        "_creationTime": 1705315200000,
+        "userId": "user_123",
+        "text": "I'm doing great, thanks for asking!",
+        "channel": "general",
+        "createdAt": 1705315200000
+      },
+      {
+        "_id": "msg_004",
+        "_creationTime": 1705315300000,
+        "userId": "user_789",
+        "text": "Good morning team!",
+        "channel": "random",
+        "createdAt": 1705315300000
+      },
+      {
+        "_id": "msg_005",
+        "_creationTime": 1705315400000,
+        "userId": "user_456",
+        "text": "Anyone up for coffee?",
+        "channel": "random",
+        "createdAt": 1705315400000
+      }
+    ]
+  }
+}

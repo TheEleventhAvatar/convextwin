@@ -1,0 +1,196 @@
+[
+  {
+    "id": "test-list-users",
+    "name": "List all users",
+    "description": "Should return all users in the database",
+    "initialSnapshot": "sample-data",
+    "functionName": "listUsers",
+    "functionType": "query",
+    "args": {},
+    "expectedOutput": {
+      "users": [
+        {
+          "_id": "user_123",
+          "_creationTime": 1705314600000,
+          "name": "Alice Johnson",
+          "email": "alice@example.com",
+          "createdAt": 1705314600000
+        },
+        {
+          "_id": "user_456",
+          "_creationTime": 1705314700000,
+          "name": "Bob Smith",
+          "email": "bob@example.com",
+          "createdAt": 1705314700000
+        },
+        {
+          "_id": "user_789",
+          "_creationTime": 1705314800000,
+          "name": "Carol Davis",
+          "email": "carol@example.com",
+          "createdAt": 1705314800000
+        }
+      ],
+      "count": 3
+    },
+    "shouldPass": true
+  },
+  {
+    "id": "test-get-user-existing",
+    "name": "Get existing user",
+    "description": "Should return a specific user when they exist",
+    "initialSnapshot": "sample-data",
+    "functionName": "getUser",
+    "functionType": "query",
+    "args": {
+      "userId": "user_123"
+    },
+    "expectedOutput": {
+      "_id": "user_123",
+      "_creationTime": 1705314600000,
+      "name": "Alice Johnson",
+      "email": "alice@example.com",
+      "createdAt": 1705314600000
+    },
+    "shouldPass": true
+  },
+  {
+    "id": "test-get-user-not-found",
+    "name": "Get non-existent user",
+    "description": "Should throw error when user doesn't exist",
+    "initialSnapshot": "sample-data",
+    "functionName": "getUser",
+    "functionType": "query",
+    "args": {
+      "userId": "user_999"
+    },
+    "shouldPass": false
+  },
+  {
+    "id": "test-create-user-success",
+    "name": "Create new user successfully",
+    "description": "Should create a new user when email is unique",
+    "initialSnapshot": "sample-data",
+    "functionName": "createUser",
+    "functionType": "mutation",
+    "args": {
+      "name": "David Wilson",
+      "email": "david@example.com"
+    },
+    "shouldPass": true
+  },
+  {
+    "id": "test-create-user-duplicate-email",
+    "name": "Create user with duplicate email",
+    "description": "Should throw error when email already exists",
+    "initialSnapshot": "sample-data",
+    "functionName": "createUser",
+    "functionType": "mutation",
+    "args": {
+      "name": "Alice Johnson",
+      "email": "alice@example.com"
+    },
+    "shouldPass": false
+  },
+  {
+    "id": "test-update-user-success",
+    "name": "Update existing user",
+    "description": "Should update user information",
+    "initialSnapshot": "sample-data",
+    "functionName": "updateUser",
+    "functionType": "mutation",
+    "args": {
+      "userId": "user_123",
+      "updates": {
+        "name": "Alice Johnson-Smith"
+      }
+    },
+    "shouldPass": true
+  },
+  {
+    "id": "test-delete-user-with-messages",
+    "name": "Delete user and their messages",
+    "description": "Should delete user and all their messages",
+    "initialSnapshot": "sample-data",
+    "functionName": "deleteUser",
+    "functionType": "mutation",
+    "args": {
+      "userId": "user_123"
+    },
+    "shouldPass": true
+  },
+  {
+    "id": "test-list-messages-all",
+    "name": "List all messages",
+    "description": "Should return all messages in the database",
+    "initialSnapshot": "sample-data",
+    "functionName": "listMessages",
+    "functionType": "query",
+    "args": {},
+    "shouldPass": true
+  },
+  {
+    "id": "test-list-messages-by-user",
+    "name": "List messages by user",
+    "description": "Should return only messages from specific user",
+    "initialSnapshot": "sample-data",
+    "functionName": "listMessages",
+    "functionType": "query",
+    "args": {
+      "userId": "user_123"
+    },
+    "shouldPass": true
+  },
+  {
+    "id": "test-list-messages-by-channel",
+    "name": "List messages by channel",
+    "description": "Should return only messages from specific channel",
+    "initialSnapshot": "sample-data",
+    "functionName": "listMessages",
+    "functionType": "query",
+    "args": {
+      "channel": "general"
+    },
+    "shouldPass": true
+  },
+  {
+    "id": "test-create-message-success",
+    "name": "Create new message",
+    "description": "Should create a new message for existing user",
+    "initialSnapshot": "sample-data",
+    "functionName": "createMessage",
+    "functionType": "mutation",
+    "args": {
+      "userId": "user_123",
+      "text": "This is a test message",
+      "channel": "general"
+    },
+    "shouldPass": true
+  },
+  {
+    "id": "test-create-message-invalid-user",
+    "name": "Create message for non-existent user",
+    "description": "Should throw error when user doesn't exist",
+    "initialSnapshot": "sample-data",
+    "functionName": "createMessage",
+    "functionType": "mutation",
+    "args": {
+      "userId": "user_999",
+      "text": "This should fail",
+      "channel": "general"
+    },
+    "shouldPass": false
+  },
+  {
+    "id": "test-get-user-stats",
+    "name": "Get user statistics",
+    "description": "Should return user stats including message counts",
+    "initialSnapshot": "sample-data",
+    "functionName": "getUserStats",
+    "functionType": "query",
+    "args": {
+      "userId": "user_123"
+    },
+    "shouldPass": true
+  }
+]

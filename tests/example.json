@@ -1,0 +1,13 @@
+{
+  "id": "example-test",
+  "name": "Example Test",
+  "description": "An example test case",
+  "initialSnapshot": "default",
+  "functionName": "listUsers",
+  "functionType": "query",
+  "args": {},
+  "expectedOutput": {
+    "count": 1
+  },
+  "shouldPass": true
+}
