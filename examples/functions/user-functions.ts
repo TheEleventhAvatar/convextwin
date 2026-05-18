@@ -6,7 +6,7 @@ export const listUsers = async (args: any, ctx: any) => {
 };
 
 export const getUser = async (args: { userId: string }, ctx: any) => {
-  const user = await ctx.db.get('users').filter(u => u._id === args.userId).first();
+  const user = await ctx.db.get('users').filter((u: any) => u._id === args.userId).first();
   if (!user) {
     throw new Error(`User with ID ${args.userId} not found`);
   }
@@ -17,7 +17,7 @@ export const createUser = async (args: { name: string; email: string }, ctx: any
   // Check if user with email already exists
   const existingUser = await ctx.db
     .query('users')
-    .filter(u => u.email === args.email)
+    .filter((u: any) => u.email === args.email)
     .first();
   
   if (existingUser) {
@@ -40,7 +40,7 @@ export const updateUser = async (args: { userId: string; updates: any }, ctx: an
 
 export const deleteUser = async (args: { userId: string }, ctx: any) => {
   // First check if user exists
-  const user = await ctx.db.get('users').filter(u => u._id === args.userId).first();
+  const user = await ctx.db.get('users').filter((u: any) => u._id === args.userId).first();
   if (!user) {
     throw new Error(`User with ID ${args.userId} not found`);
   }
@@ -48,7 +48,7 @@ export const deleteUser = async (args: { userId: string }, ctx: any) => {
   // Delete all messages from this user
   const userMessages = await ctx.db
     .query('messages')
-    .filter(m => m.userId === args.userId)
+    .filter((m: any) => m.userId === args.userId)
     .collect();
 
   for (const message of userMessages) {
@@ -65,11 +65,11 @@ export const listMessages = async (args: { userId?: string; channel?: string }, 
   let query = ctx.db.query('messages');
 
   if (args.userId) {
-    query = query.filter(m => m.userId === args.userId);
+    query = query.filter((m: any) => m.userId === args.userId);
   }
 
   if (args.channel) {
-    query = query.filter(m => m.channel === args.channel);
+    query = query.filter((m: any) => m.channel === args.channel);
   }
 
   const messages = await query.collect();
@@ -82,7 +82,7 @@ export const createMessage = async (args: {
   channel: string 
 }, ctx: any) => {
   // Verify user exists
-  const user = await ctx.db.get('users').filter(u => u._id === args.userId).first();
+  const user = await ctx.db.get('users').filter((u: any) => u._id === args.userId).first();
   if (!user) {
     throw new Error(`User with ID ${args.userId} not found`);
   }
@@ -98,14 +98,14 @@ export const createMessage = async (args: {
 };
 
 export const getUserStats = async (args: { userId: string }, ctx: any) => {
-  const user = await ctx.db.get('users').filter(u => u._id === args.userId).first();
+  const user = await ctx.db.get('users').filter((u: any) => u._id === args.userId).first();
   if (!user) {
     throw new Error(`User with ID ${args.userId} not found`);
   }
 
   const messages = await ctx.db
     .query('messages')
-    .filter(m => m.userId === args.userId)
+    .filter((m: any) => m.userId === args.userId)
     .collect();
 
   const messagesByChannel = messages.reduce((acc: any, message: any) => {
