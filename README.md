@@ -1,302 +1,239 @@
 # Convex Twin
 
-A local deterministic replay and testing environment for Convex backends. Convex Twin allows developers to simulate, replay, and test Convex queries and mutations on a snapshot of production-like data.
+**Deterministic replay engine for Convex backends.** Debug production data locally, replay exact execution sequences, and test mutations against snapshots with controlled anomalies.
 
-## Features
+## What It Is
 
-- **Data Snapshot Layer**: JSON-based snapshot system to store and restore Convex table data
-- **Function Runner**: Local execution of Convex functions with mock context
-- **Execution Logging**: Structured logging of every function run with input/output and state changes
-- **State Diff Engine**: Compare database states before and after function execution
-- **CLI Interface**: Developer-friendly command-line interface
-- **Test Framework**: Simple test case definition and execution
+Convex Twin is a local sandbox for Convex backend developers that:
+- Loads production-like data into JSON snapshots
+- Replays exact function execution sequences deterministically
+- Injects transient faults (delayed writes, stale reads, concurrent mutations) to test resilience
+- Provides a web UI and CLI to inspect state transitions and function logs
 
-## Installation
+**Use cases:**
+- Reproduce and debug production bugs locally
+- Write reproducible tests against real data
+- Validate mutation safety before deployment
+- Experiment with failure scenarios
 
-```bash
-npm install -g convex-twin
+---
+
+## Why Replay & Debugging Matters
+
+In production Convex backends, state transitions are complex:
+- Mutations run concurrently and may race
+- Network delays can cause stale reads
+- Cascading updates across tables are hard to trace
+
+**Without replay:** You guess at the bug, redeploy, and hope. Hours wasted.
+
+**With Convex Twin:** Capture the exact data state before the bug, replay the same mutation 100 times, inject delays/conflicts, and watch the bug surface in isolation on your laptop.
+
+---
+
+## Architecture
+
+```
+┌─────────────────────────────────────────────┐
+│          Convex Twin UI Server              │
+│  (HTTP API + Web Dashboard)                 │
+├─────────────────────────────────────────────┤
+│                                             │
+│  ┌──────────────┐  ┌─────────────────┐    │
+│  │ Snapshot     │  │ Workflow Runner │    │
+│  │ Manager      │  │ (with perturbs) │    │
+│  └──────────────┘  └─────────────────┘    │
+│         │                   │              │
+│         └───────┬───────────┘              │
+│                 ▼                          │
+│      ┌──────────────────────┐             │
+│      │  Function Runner     │             │
+│      │  (Mock Context)      │             │
+│      └──────────────────────┘             │
+│                 │                          │
+│                 ▼                          │
+│      ┌──────────────────────┐             │
+│      │  Mock Database       │             │
+│      │  (In-Memory State)   │             │
+│      └──────────────────────┘             │
+│                 │                          │
+│                 ▼                          │
+│      ┌──────────────────────┐             │
+│      │  Event Log Store     │             │
+│      │  (Action + Diffs)    │             │
+│      └──────────────────────┘             │
+│                                            │
+└─────────────────────────────────────────────┘
 ```
 
-Or clone and build locally:
+---
+
+## Workflows
+
+### 1. Replay a Bug
 
 ```bash
-git clone <repository-url>
-cd convex-twin
+# Export production snapshot
+convex export snapshots/prod-2026-05-19.json
+
+# Load snapshot
+twin snapshot load prod-2026-05-19
+
+# Replay the exact mutation that failed
+twin run createOrder --snapshot prod-2026-05-19 --args '{"userId":"user_456","items":[...]}'
+
+# Check state diff
+twin diff prod-2026-05-19
+```
+
+### 2. Inject Perturbations & Test Resilience
+
+```bash
+# Run a mutation under delayed writes (500ms latency)
+twin run updateInventory \
+  --snapshot prod-2026-05-19 \
+  --perturb delayedWrites \
+  --latency 500
+
+# Run under concurrent mutations (race condition)
+twin run transfer \
+  --snapshot prod-2026-05-19 \
+  --perturb concurrentMutations
+```
+
+### 3. Execute Test Suite
+
+```bash
+# Run all tests against a snapshot
+twin test tests/mutation-tests.json --snapshot prod-2026-05-19
+
+# Generate coverage report
+twin test tests/ --coverage
+```
+
+---
+
+## Replay Example
+
+**Scenario:** A user reports that their order total is wrong after updating quantities.
+
+**Step 1: Capture the state**
+```json
+// snapshots/order-bug.json
+{
+  "orders": [
+    {
+      "_id": "order_123",
+      "items": [{"sku": "abc", "qty": 2, "price": 10}],
+      "total": 20
+    }
+  ]
+}
+```
+
+**Step 2: Replay the mutation**
+```bash
+twin run updateOrderQuantity \
+  --snapshot order-bug \
+  --args '{"orderId":"order_123","itemSku":"abc","newQty":5}'
+```
+
+**Step 3: Inspect the log**
+```json
+{
+  "functionName": "updateOrderQuantity",
+  "args": {"orderId":"order_123","itemSku":"abc","newQty":5},
+  "startTime": "2026-05-19T16:00:00Z",
+  "duration": 45,
+  "stateChanges": {
+    "orders": {
+      "updated": ["order_123"]
+    }
+  },
+  "result": {"total": 50}
+}
+```
+
+**Step 4: Compare states**
+```bash
+twin diff order-bug
+# Shows: total: 20 → 50 ✓
+```
+
+---
+
+## Perturbation Example
+
+**Scenario:** Test that a payment mutation is idempotent under network delays.
+
+```bash
+# Run the same mutation 3 times with 1-second delays
+for i in {1..3}; do
+  twin run processPayment \
+    --snapshot clean-state \
+    --args '{"userId":"user_789","amount":9999}' \
+    --perturb delayedWrites \
+    --latency 1000
+done
+
+# Each run should produce the same result
+twin logs list --function processPayment
+```
+
+**Expected logs:**
+```
+Run 1: amount_charged: 9999 ✓
+Run 2: amount_charged: 9999 ✓ (no duplicate charge)
+Run 3: amount_charged: 9999 ✓ (no duplicate charge)
+```
+
+---
+
+## Installation & Quick Start
+
+```bash
+# Clone and install
+git clone <repo>
+cd convextwin
 npm install
 npm run build
-npm link
+
+# Start the UI server with perturbations
+npm run start-ui-perturb -- --host 0.0.0.0 --port 3000 \
+  --delayedWrites --staleReads --concurrentMutations --latency 1200
+
+# Open http://localhost:3000
 ```
 
-## Quick Start
+---
 
-### 1. Initialize a Project
+## Structure
+
+```
+src/
+├── cli/                  # CLI commands
+├── core/types.ts         # Type definitions
+├── diff/                 # State diff engine
+├── events/               # Event logging
+├── replay/               # Replay validator
+├── runner/               # Function runner + mock DB
+├── snapshot/             # Snapshot manager
+├── ui/                   # Web dashboard
+└── workflows/            # Replay orchestration + perturbations
+```
+
+---
+
+## Deployment
+
+Deploy the UI to Render:
 
 ```bash
-twin init
+docker build -t convex-twin .
+docker run -p 3000:3000 convex-twin
 ```
 
-This creates the necessary directory structure:
-- `snapshots/` - Database snapshots
-- `logs/` - Execution logs
-- `tests/` - Test cases
-- `functions/` - Your Convex functions
-
-### 2. Load Sample Data
-
-```bash
-# Copy example data
-cp examples/snapshots/sample-data.json snapshots/
-cp examples/tests/user-functions-tests.json tests/
-cp examples/functions/user-functions.ts functions/
-
-# Load the snapshot
-twin snapshot load sample-data
-```
-
-### 3. Run a Function
-
-```bash
-# Run a query function
-twin run listUsers --type query --args '{}'
-
-# Run a mutation with arguments
-twin run createUser --type mutation --args '{"name":"John Doe","email":"john@example.com"}'
-```
-
-### 4. View State Changes
-
-```bash
-# Show diff of last execution
-twin diff
-
-# Compare two snapshots
-twin diff before-snapshot after-snapshot
-```
-
-### 5. Run Tests
-
-```bash
-# Run all tests
-twin test
-
-# Run specific test file
-twin test tests/user-functions-tests.json
-```
-
-## CLI Commands
-
-### Snapshot Management
-
-```bash
-# List all snapshots
-twin snapshot list
-
-# Load and view snapshot contents
-twin snapshot load <snapshot-name>
-twin snapshot load <snapshot-name> --verbose
-
-# Delete a snapshot
-twin snapshot delete <snapshot-name>
-
-# Export/import snapshots
-twin snapshot export <snapshot-name> <output-file>
-twin snapshot import <input-file> [snapshot-name]
-```
-
-### Function Execution
-
-```bash
-# Run a function
-twin run <function-name> --args '{"key":"value"}' --type query|mutation|action
-
-# Options:
-#   --args, -a     Arguments as JSON string (default: {})
-#   --snapshot, -s Snapshot to use (default: default)
-#   --type, -t     Function type: query, mutation, or action (default: query)
-#   --no-log       Disable execution logging
-```
-
-### State Comparison
-
-```bash
-# Compare database states
-twin diff [before-snapshot] [after-snapshot]
-
-# Options:
-#   --format, -f   Output format: human or json (default: human)
-```
-
-### Test Execution
-
-```bash
-# Run tests
-twin test [test-file]
-
-# Options:
-#   --verbose, -v  Verbose output
-```
-
-### Log Management
-
-```bash
-# List execution logs
-twin logs list
-twin logs list --date 2024-01-15
-twin logs list --function createUser
-
-# Show detailed log
-twin logs show <log-id>
-
-# Export logs
-twin logs export output.json --format json
-twin logs export output.csv --format csv
-
-# Clear all logs
-twin logs clear
-```
-
-### Project Management
-
-```bash
-# Initialize new project
-twin init [--dir <directory>]
-
-# Show project status
-twin status
-```
-
-## Project Structure
-
-```
-your-project/
-├── snapshots/           # Database snapshots
-│   ├── default.json
-│   └── sample-data.json
-├── logs/               # Execution logs
-│   ├── 2024-01-15-executions.json
-│   └── session-123456.json
-├── tests/              # Test cases
-│   └── user-functions-tests.json
-├── functions/          # Your Convex functions
-│   └── user-functions.ts
-└── twin.config.json    # Configuration (optional)
-```
-
-## Snapshot Format
-
-Snapshots are JSON files with the following structure:
-
-```json
-{
-  "version": "1.0.0",
-  "timestamp": "2024-01-15T10:30:00.000Z",
-  "tables": {
-    "users": [
-      {
-        "_id": "user_123",
-        "_creationTime": 1705314600000,
-        "name": "Alice Johnson",
-        "email": "alice@example.com"
-      }
-    ],
-    "messages": [...]
-  }
-}
-```
-
-## Test Case Format
-
-Test cases are defined as JSON files:
-
-```json
-{
-  "id": "test-create-user",
-  "name": "Create new user",
-  "description": "Should create a new user successfully",
-  "initialSnapshot": "sample-data",
-  "functionName": "createUser",
-  "functionType": "mutation",
-  "args": {
-    "name": "John Doe",
-    "email": "john@example.com"
-  },
-  "expectedOutput": {
-    "name": "John Doe",
-    "email": "john@example.com"
-  },
-  "shouldPass": true
-}
-```
-
-### Test Case Fields
-
-- `id`: Unique identifier for the test
-- `name`: Human-readable test name
-- `description`: Optional test description
-- `initialSnapshot`: Snapshot name or snapshot object to start from
-- `functionName`: Name of function to execute
-- `functionType`: `query`, `mutation`, or `action`
-- `args`: Arguments to pass to the function
-- `expectedOutput`: Optional expected return value
-- `expectedState`: Optional expected final database state
-- `shouldPass`: Whether the test is expected to pass
-
-## Function Integration
-
-### Mock Functions
-
-Convex Twin provides mock implementations for common functions. You can extend the mock function registry in `src/tests/test-framework.ts`:
-
-```typescript
-private createMockFunction(functionName: string, functionType: string) {
-  return async (args: any, ctx: any) => {
-    switch (functionName) {
-      case 'yourCustomFunction':
-        return await yourImplementation(args, ctx);
-      default:
-        return { message: `Mock function ${functionName} executed` };
-    }
-  };
-}
-```
-
-### Real Function Integration
-
-To use your actual Convex functions:
-
-1. Place your function files in the `functions/` directory
-2. Import them in your test framework
-3. Update the function runner to load real functions
-
-## Deterministic Execution
-
-Convex Twin ensures deterministic execution by:
-
-- Using mock implementations for external services
-- Providing consistent mock database behavior
-- Seeding random generators
-- Logging all state changes
-
-## State Diff Output
-
-### Human-Readable Format
-
-```
-=== Database State Diff ===
-
-📝 Added Records:
-  users: 1 records
-    + user_456
-
-✏️  Updated Records:
-  users: 1 records
-    ~ user_123
-      name: "Alice" → "Alice Smith"
-
-🗑️  Deleted Records:
-  messages: 1 records
-    - msg_001
-```
+Public URL: https://convex-twin-ui-demo.onrender.com
 
 ### JSON Format
 
