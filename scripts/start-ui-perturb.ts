@@ -14,7 +14,7 @@ function parseArgs() {
 
   return {
     port: Number(get('port', '3000')),
-    host: get('host', '127.0.0.1'),
+    host: get('host', '0.0.0.0'),
     snapshot: get('snapshot', 'default'),
     delayedWrites: has('delayedWrites'),
     staleReads: has('staleReads'),
