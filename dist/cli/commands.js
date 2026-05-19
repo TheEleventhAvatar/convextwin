@@ -12,6 +12,7 @@ const function_runner_1 = require("../runner/function-runner");
 const execution_logger_1 = require("../logging/execution-logger");
 const state_diff_engine_1 = require("../diff/state-diff-engine");
 const test_framework_1 = require("../tests/test-framework");
+const ui_server_1 = require("../ui/ui-server");
 class CLICommands {
     constructor() {
         this.snapshotManager = new snapshot_manager_1.SnapshotManager();
@@ -306,6 +307,37 @@ class CLICommands {
             }
             catch (error) {
                 console.error(chalk_1.default.red('Error clearing logs:'), error);
+            }
+        });
+        return cmd;
+    }
+    createUiCommand() {
+        const cmd = new commander_1.Command('ui');
+        cmd
+            .description('Start the local CRUD UI for the current snapshot environment')
+            .option('-p, --port <port>', 'Port to listen on', '3000')
+            .option('-H, --host <host>', 'Host to listen on', '127.0.0.1')
+            .option('-s, --snapshot <name>', 'Snapshot to load on startup', 'default')
+            .action(async (options) => {
+            try {
+                const server = new ui_server_1.TwinUIServer({
+                    port: Number(options.port),
+                    host: options.host,
+                    snapshotName: options.snapshot
+                });
+                const address = await server.start();
+                console.log(chalk_1.default.green('Local UI started.'));
+                console.log(chalk_1.default.blue(`Snapshot: ${address.snapshotName}`));
+                console.log(chalk_1.default.blue(`URL: http://${address.host}:${address.port}`));
+                console.log(chalk_1.default.gray('Press Ctrl+C to stop the server.'));
+                process.on('SIGINT', async () => {
+                    await server.stop();
+                    process.exit(0);
+                });
+            }
+            catch (error) {
+                console.error(chalk_1.default.red('Error starting UI server:'), error);
+                process.exit(1);
             }
         });
         return cmd;

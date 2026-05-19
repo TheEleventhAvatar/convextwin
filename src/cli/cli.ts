@@ -20,6 +20,7 @@ program.addCommand(commands.createDiffCommand());
 program.addCommand(commands.createResetCommand());
 program.addCommand(commands.createTestCommand());
 program.addCommand(commands.createLogsCommand());
+program.addCommand(commands.createUiCommand());
 
 program
   .command('init')

@@ -1,0 +1,44 @@
+{
+  "version": "1.0.0",
+  "updatedAt": "2026-05-19T09:51:40.502Z",
+  "events": [
+    {
+      "eventId": "evt_000001",
+      "sequence": 1,
+      "timestamp": "2026-05-19T09:51:40.447Z",
+      "actionType": "snapshot_load",
+      "entityName": "snapshot",
+      "affectedRecordId": "default",
+      "preStateSnapshotId": "default",
+      "postStateSnapshotId": "default",
+      "mutationPayload": {
+        "snapshotName": "default"
+      },
+      "metadata": {
+        "source": "ui",
+        "snapshotName": "default"
+      }
+    },
+    {
+      "eventId": "evt_000002",
+      "sequence": 2,
+      "timestamp": "2026-05-19T09:51:40.502Z",
+      "actionType": "create",
+      "entityName": "users",
+      "affectedRecordId": "tilgj07nfnplkrrgk67b",
+      "preStateSnapshotId": "default",
+      "postStateSnapshotId": "evt_000002",
+      "mutationPayload": {
+        "record": {
+          "_id": "tilgj07nfnplkrrgk67b",
+          "_creationTime": 1779184300502,
+          "name": "Smoke Test"
+        }
+      },
+      "metadata": {
+        "source": "ui",
+        "route": "POST /api/tables/:table"
+      }
+    }
+  ]
+}

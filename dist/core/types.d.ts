@@ -6,6 +6,24 @@ export interface DatabaseSnapshot {
     timestamp: string;
     tables: ConvexTable;
 }
+export type ActionEventType = 'create' | 'update' | 'delete' | 'snapshot_load' | 'snapshot_save';
+export interface ActionEvent {
+    eventId: string;
+    sequence: number;
+    timestamp: string;
+    actionType: ActionEventType;
+    entityName: string;
+    affectedRecordId: string | null;
+    preStateSnapshotId: string;
+    postStateSnapshotId: string;
+    mutationPayload: any;
+    metadata?: Record<string, any>;
+}
+export interface ActionEventLogFile {
+    version: string;
+    updatedAt: string;
+    events: ActionEvent[];
+}
 export interface FunctionContext {
     db: MockDatabase;
     auth: any;

@@ -15,7 +15,7 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
     for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CLICommands = exports.TestFramework = exports.StateDiffEngine = exports.ExecutionLogger = exports.MockTableQueryImpl = exports.MockDatabaseImpl = exports.FunctionRunner = exports.ExportImportManager = exports.SnapshotManager = void 0;
+exports.CLICommands = exports.replayEvents = exports.StateEventTracker = exports.EventLogStore = exports.TwinUIServer = exports.TestFramework = exports.StateDiffEngine = exports.ExecutionLogger = exports.MockTableQueryImpl = exports.MockDatabaseImpl = exports.FunctionRunner = exports.ExportImportManager = exports.SnapshotManager = void 0;
 var snapshot_manager_1 = require("./snapshot/snapshot-manager");
 Object.defineProperty(exports, "SnapshotManager", { enumerable: true, get: function () { return snapshot_manager_1.SnapshotManager; } });
 var export_import_1 = require("./snapshot/export-import");
@@ -31,6 +31,14 @@ var state_diff_engine_1 = require("./diff/state-diff-engine");
 Object.defineProperty(exports, "StateDiffEngine", { enumerable: true, get: function () { return state_diff_engine_1.StateDiffEngine; } });
 var test_framework_1 = require("./tests/test-framework");
 Object.defineProperty(exports, "TestFramework", { enumerable: true, get: function () { return test_framework_1.TestFramework; } });
+var ui_server_1 = require("./ui/ui-server");
+Object.defineProperty(exports, "TwinUIServer", { enumerable: true, get: function () { return ui_server_1.TwinUIServer; } });
+var event_log_store_1 = require("./events/event-log-store");
+Object.defineProperty(exports, "EventLogStore", { enumerable: true, get: function () { return event_log_store_1.EventLogStore; } });
+var state_event_tracker_1 = require("./events/state-event-tracker");
+Object.defineProperty(exports, "StateEventTracker", { enumerable: true, get: function () { return state_event_tracker_1.StateEventTracker; } });
+var replay_events_1 = require("./replay/replay-events");
+Object.defineProperty(exports, "replayEvents", { enumerable: true, get: function () { return replay_events_1.replayEvents; } });
 __exportStar(require("./core/types"), exports);
 // Convenience exports for common use cases
 var commands_1 = require("./cli/commands");

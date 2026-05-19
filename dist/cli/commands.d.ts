@@ -12,5 +12,6 @@ export declare class CLICommands {
     createResetCommand(): Command;
     createTestCommand(): Command;
     createLogsCommand(): Command;
+    createUiCommand(): Command;
 }
 //# sourceMappingURL=commands.d.ts.map

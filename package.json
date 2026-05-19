@@ -4,11 +4,12 @@
   "description": "Local deterministic replay and testing environment for Convex backends",
   "main": "dist/index.js",
   "bin": {
-    "twin": "dist/cli.js"
+    "twin": "dist/cli/cli.js"
   },
   "scripts": {
     "build": "tsc",
-    "dev": "ts-node src/cli.ts",
+    "dev": "ts-node src/cli/cli.ts",
+    "ui": "ts-node src/cli/cli.ts ui",
     "test": "jest",
     "lint": "eslint src/**/*.ts",
     "clean": "rm -rf dist"

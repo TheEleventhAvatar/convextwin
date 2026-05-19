@@ -5,6 +5,10 @@ export { MockDatabaseImpl, MockTableQueryImpl } from './runner/mock-database';
 export { ExecutionLogger } from './logging/execution-logger';
 export { StateDiffEngine } from './diff/state-diff-engine';
 export { TestFramework } from './tests/test-framework';
+export { TwinUIServer } from './ui/ui-server';
+export { EventLogStore } from './events/event-log-store';
+export { StateEventTracker } from './events/state-event-tracker';
+export { replayEvents } from './replay/replay-events';
 export * from './core/types';
 export { CLICommands } from './cli/commands';
 //# sourceMappingURL=index.d.ts.map

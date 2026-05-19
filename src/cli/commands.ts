@@ -8,6 +8,7 @@ import { FunctionRunner } from '../runner/function-runner';
 import { ExecutionLogger } from '../logging/execution-logger';
 import { StateDiffEngine } from '../diff/state-diff-engine';
 import { TestFramework } from '../tests/test-framework';
+import { TwinUIServer } from '../ui/ui-server';
 
 export class CLICommands {
   private snapshotManager: SnapshotManager;
@@ -353,6 +354,42 @@ export class CLICommands {
           console.log(chalk.green('All logs cleared.'));
         } catch (error) {
           console.error(chalk.red('Error clearing logs:'), error);
+        }
+      });
+
+    return cmd;
+  }
+
+  createUiCommand(): Command {
+    const cmd = new Command('ui');
+
+    cmd
+      .description('Start the local CRUD UI for the current snapshot environment')
+      .option('-p, --port <port>', 'Port to listen on', '3000')
+      .option('-H, --host <host>', 'Host to listen on', '127.0.0.1')
+      .option('-s, --snapshot <name>', 'Snapshot to load on startup', 'default')
+      .action(async (options) => {
+        try {
+          const server = new TwinUIServer({
+            port: Number(options.port),
+            host: options.host,
+            snapshotName: options.snapshot
+          });
+
+          const address = await server.start();
+
+          console.log(chalk.green('Local UI started.'));
+          console.log(chalk.blue(`Snapshot: ${address.snapshotName}`));
+          console.log(chalk.blue(`URL: http://${address.host}:${address.port}`));
+          console.log(chalk.gray('Press Ctrl+C to stop the server.'));
+
+          process.on('SIGINT', async () => {
+            await server.stop();
+            process.exit(0);
+          });
+        } catch (error) {
+          console.error(chalk.red('Error starting UI server:'), error);
+          process.exit(1);
         }
       });
 
