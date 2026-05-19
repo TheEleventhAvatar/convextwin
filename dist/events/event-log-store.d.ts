@@ -1,7 +1,6 @@
 import { ActionEvent } from '../core/types';
 export declare class EventLogStore {
     private readonly filePath;
-    private loaded;
     private events;
     constructor(baseDir?: string, fileName?: string);
     listEvents(): Promise<ActionEvent[]>;
@@ -11,7 +10,7 @@ export declare class EventLogStore {
         sequence: number;
     }>;
     appendEvent(event: ActionEvent): Promise<ActionEvent>;
-    private load;
+    private reload;
     private save;
 }
 //# sourceMappingURL=event-log-store.d.ts.map

@@ -8,7 +8,19 @@ export interface DatabaseSnapshot {
   tables: ConvexTable;
 }
 
-export type ActionEventType = 'create' | 'update' | 'delete' | 'snapshot_load' | 'snapshot_save';
+export type ActionEventType =
+  | 'create'
+  | 'update'
+  | 'delete'
+  | 'snapshot_load'
+  | 'snapshot_save'
+  | 'workflow_start'
+  | 'workflow_step'
+  | 'workflow_end'
+  | 'conflict'
+  | 'retry';
+
+export type EventSource = 'browser' | 'api' | 'replay' | 'simulated-agent';
 
 export interface ActionEvent {
   eventId: string;
@@ -20,6 +32,10 @@ export interface ActionEvent {
   preStateSnapshotId: string;
   postStateSnapshotId: string;
   mutationPayload: any;
+  workflowSessionId?: string;
+  retryChainId?: string;
+  attemptNumber?: number;
+  actionSource?: EventSource;
   metadata?: Record<string, any>;
 }
 

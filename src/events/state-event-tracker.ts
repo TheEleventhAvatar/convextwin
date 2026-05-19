@@ -8,6 +8,10 @@ interface TrackEventInput {
   mutationPayload: any;
   preStateSnapshotId?: string;
   postStateSnapshotId?: string;
+  workflowSessionId?: string;
+  retryChainId?: string;
+  attemptNumber?: number;
+  actionSource?: 'browser' | 'api' | 'replay' | 'simulated-agent';
   metadata?: Record<string, any>;
 }
 
@@ -33,6 +37,77 @@ export class StateEventTracker {
       affectedRecordId: snapshotName,
       mutationPayload: { snapshotName },
       postStateSnapshotId: snapshotName,
+      metadata
+    });
+  }
+
+  async logWorkflowStart(workflowSessionId: string, workflowName: string, metadata: Record<string, any> = {}): Promise<ActionEvent> {
+    return this.recordEvent({
+      actionType: 'workflow_start',
+      entityName: 'workflow',
+      affectedRecordId: workflowSessionId,
+      mutationPayload: { workflowSessionId, workflowName },
+      workflowSessionId,
+      actionSource: metadata.actionSource ?? 'simulated-agent',
+      metadata
+    });
+  }
+
+  async logWorkflowStep(workflowSessionId: string, stepName: string, payload: any, metadata: Record<string, any> = {}): Promise<ActionEvent> {
+    return this.recordEvent({
+      actionType: 'workflow_step',
+      entityName: 'workflow',
+      affectedRecordId: workflowSessionId,
+      mutationPayload: { workflowSessionId, stepName, payload },
+      workflowSessionId,
+      actionSource: metadata.actionSource ?? 'simulated-agent',
+      metadata
+    });
+  }
+
+  async logWorkflowEnd(workflowSessionId: string, workflowName: string, metadata: Record<string, any> = {}): Promise<ActionEvent> {
+    return this.recordEvent({
+      actionType: 'workflow_end',
+      entityName: 'workflow',
+      affectedRecordId: workflowSessionId,
+      mutationPayload: { workflowSessionId, workflowName },
+      workflowSessionId,
+      actionSource: metadata.actionSource ?? 'simulated-agent',
+      metadata
+    });
+  }
+
+  async logConflict(tableName: string, recordId: string, stalePayload: any, metadata: Record<string, any> = {}): Promise<ActionEvent> {
+    return this.recordEvent({
+      actionType: 'conflict',
+      entityName: tableName,
+      affectedRecordId: recordId,
+      mutationPayload: {
+        recordId,
+        stalePayload,
+        reason: metadata.reason ?? 'stale_write'
+      },
+      workflowSessionId: metadata.workflowSessionId,
+      retryChainId: metadata.retryChainId,
+      attemptNumber: metadata.attemptNumber,
+      actionSource: metadata.actionSource ?? 'api',
+      metadata
+    });
+  }
+
+  async logRetry(tableName: string, recordId: string, payload: any, metadata: Record<string, any> = {}): Promise<ActionEvent> {
+    return this.recordEvent({
+      actionType: 'retry',
+      entityName: tableName,
+      affectedRecordId: recordId,
+      mutationPayload: {
+        recordId,
+        payload
+      },
+      workflowSessionId: metadata.workflowSessionId,
+      retryChainId: metadata.retryChainId,
+      attemptNumber: metadata.attemptNumber,
+      actionSource: metadata.actionSource ?? 'api',
       metadata
     });
   }
@@ -92,6 +167,7 @@ export class StateEventTracker {
 
   private async recordEvent(input: TrackEventInput): Promise<ActionEvent> {
     const identity = await this.eventStore.allocateEventIdentity();
+    const metadata = input.metadata ?? {};
     const event: ActionEvent = {
       eventId: identity.eventId,
       sequence: identity.sequence,
@@ -99,10 +175,14 @@ export class StateEventTracker {
       actionType: input.actionType,
       entityName: input.entityName,
       affectedRecordId: input.affectedRecordId,
-      preStateSnapshotId: input.preStateSnapshotId ?? this.currentSnapshotId,
-      postStateSnapshotId: input.postStateSnapshotId ?? identity.eventId,
+      preStateSnapshotId: input.preStateSnapshotId ?? metadata.preStateSnapshotId ?? this.currentSnapshotId,
+      postStateSnapshotId: input.postStateSnapshotId ?? metadata.postStateSnapshotId ?? identity.eventId,
       mutationPayload: input.mutationPayload,
-      metadata: input.metadata
+      workflowSessionId: input.workflowSessionId ?? metadata.workflowSessionId,
+      retryChainId: input.retryChainId ?? metadata.retryChainId,
+      attemptNumber: input.attemptNumber ?? metadata.attemptNumber,
+      actionSource: input.actionSource ?? metadata.actionSource ?? metadata.source,
+      metadata
     };
 
     await this.eventStore.appendEvent(event);

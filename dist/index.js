@@ -15,7 +15,7 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
     for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CLICommands = exports.replayEvents = exports.StateEventTracker = exports.EventLogStore = exports.TwinUIServer = exports.TestFramework = exports.StateDiffEngine = exports.ExecutionLogger = exports.MockTableQueryImpl = exports.MockDatabaseImpl = exports.FunctionRunner = exports.ExportImportManager = exports.SnapshotManager = void 0;
+exports.CLICommands = exports.normalizePerturbationHooks = exports.WorkflowRunner = exports.validateReplay = exports.replayEvents = exports.StateEventTracker = exports.EventLogStore = exports.TwinUIServer = exports.TestFramework = exports.StateDiffEngine = exports.ExecutionLogger = exports.MockTableQueryImpl = exports.MockDatabaseImpl = exports.FunctionRunner = exports.ExportImportManager = exports.SnapshotManager = void 0;
 var snapshot_manager_1 = require("./snapshot/snapshot-manager");
 Object.defineProperty(exports, "SnapshotManager", { enumerable: true, get: function () { return snapshot_manager_1.SnapshotManager; } });
 var export_import_1 = require("./snapshot/export-import");
@@ -39,6 +39,12 @@ var state_event_tracker_1 = require("./events/state-event-tracker");
 Object.defineProperty(exports, "StateEventTracker", { enumerable: true, get: function () { return state_event_tracker_1.StateEventTracker; } });
 var replay_events_1 = require("./replay/replay-events");
 Object.defineProperty(exports, "replayEvents", { enumerable: true, get: function () { return replay_events_1.replayEvents; } });
+var replay_validator_1 = require("./replay/replay-validator");
+Object.defineProperty(exports, "validateReplay", { enumerable: true, get: function () { return replay_validator_1.validateReplay; } });
+var workflow_runner_1 = require("./workflows/workflow-runner");
+Object.defineProperty(exports, "WorkflowRunner", { enumerable: true, get: function () { return workflow_runner_1.WorkflowRunner; } });
+var perturbation_hooks_1 = require("./workflows/perturbation-hooks");
+Object.defineProperty(exports, "normalizePerturbationHooks", { enumerable: true, get: function () { return perturbation_hooks_1.normalizePerturbationHooks; } });
 __exportStar(require("./core/types"), exports);
 // Convenience exports for common use cases
 var commands_1 = require("./cli/commands");

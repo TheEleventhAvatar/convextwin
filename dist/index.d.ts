@@ -9,6 +9,9 @@ export { TwinUIServer } from './ui/ui-server';
 export { EventLogStore } from './events/event-log-store';
 export { StateEventTracker } from './events/state-event-tracker';
 export { replayEvents } from './replay/replay-events';
+export { validateReplay } from './replay/replay-validator';
+export { WorkflowRunner } from './workflows/workflow-runner';
+export { normalizePerturbationHooks } from './workflows/perturbation-hooks';
 export * from './core/types';
 export { CLICommands } from './cli/commands';
 //# sourceMappingURL=index.d.ts.map

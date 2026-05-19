@@ -38,13 +38,12 @@ const fs = __importStar(require("fs-extra"));
 const path = __importStar(require("path"));
 class EventLogStore {
     constructor(baseDir = './logs', fileName = 'action-events.json') {
-        this.loaded = false;
         this.events = [];
         this.filePath = path.resolve(baseDir, fileName);
         fs.ensureDirSync(path.dirname(this.filePath));
     }
     async listEvents() {
-        await this.load();
+        await this.reload();
         return [...this.events].sort((left, right) => {
             if (left.sequence !== right.sequence) {
                 return left.sequence - right.sequence;
@@ -57,7 +56,7 @@ class EventLogStore {
         return events.find(event => event.eventId === eventId) ?? null;
     }
     async allocateEventIdentity() {
-        await this.load();
+        await this.reload();
         const sequence = this.events.length + 1;
         return {
             sequence,
@@ -65,15 +64,13 @@ class EventLogStore {
         };
     }
     async appendEvent(event) {
-        await this.load();
+        await this.reload();
         this.events.push(event);
         await this.save();
         return event;
     }
-    async load() {
-        if (this.loaded) {
-            return;
-        }
+    async reload() {
+        this.events = [];
         if (await fs.pathExists(this.filePath)) {
             const raw = await fs.readJSON(this.filePath);
             this.events = Array.isArray(raw) ? raw : raw.events ?? [];
@@ -84,7 +81,6 @@ class EventLogStore {
             }
             return new Date(left.timestamp).getTime() - new Date(right.timestamp).getTime();
         });
-        this.loaded = true;
     }
     async save() {
         const payload = {

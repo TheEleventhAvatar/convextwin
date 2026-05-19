@@ -22,6 +22,72 @@ class StateEventTracker {
             metadata
         });
     }
+    async logWorkflowStart(workflowSessionId, workflowName, metadata = {}) {
+        return this.recordEvent({
+            actionType: 'workflow_start',
+            entityName: 'workflow',
+            affectedRecordId: workflowSessionId,
+            mutationPayload: { workflowSessionId, workflowName },
+            workflowSessionId,
+            actionSource: metadata.actionSource ?? 'simulated-agent',
+            metadata
+        });
+    }
+    async logWorkflowStep(workflowSessionId, stepName, payload, metadata = {}) {
+        return this.recordEvent({
+            actionType: 'workflow_step',
+            entityName: 'workflow',
+            affectedRecordId: workflowSessionId,
+            mutationPayload: { workflowSessionId, stepName, payload },
+            workflowSessionId,
+            actionSource: metadata.actionSource ?? 'simulated-agent',
+            metadata
+        });
+    }
+    async logWorkflowEnd(workflowSessionId, workflowName, metadata = {}) {
+        return this.recordEvent({
+            actionType: 'workflow_end',
+            entityName: 'workflow',
+            affectedRecordId: workflowSessionId,
+            mutationPayload: { workflowSessionId, workflowName },
+            workflowSessionId,
+            actionSource: metadata.actionSource ?? 'simulated-agent',
+            metadata
+        });
+    }
+    async logConflict(tableName, recordId, stalePayload, metadata = {}) {
+        return this.recordEvent({
+            actionType: 'conflict',
+            entityName: tableName,
+            affectedRecordId: recordId,
+            mutationPayload: {
+                recordId,
+                stalePayload,
+                reason: metadata.reason ?? 'stale_write'
+            },
+            workflowSessionId: metadata.workflowSessionId,
+            retryChainId: metadata.retryChainId,
+            attemptNumber: metadata.attemptNumber,
+            actionSource: metadata.actionSource ?? 'api',
+            metadata
+        });
+    }
+    async logRetry(tableName, recordId, payload, metadata = {}) {
+        return this.recordEvent({
+            actionType: 'retry',
+            entityName: tableName,
+            affectedRecordId: recordId,
+            mutationPayload: {
+                recordId,
+                payload
+            },
+            workflowSessionId: metadata.workflowSessionId,
+            retryChainId: metadata.retryChainId,
+            attemptNumber: metadata.attemptNumber,
+            actionSource: metadata.actionSource ?? 'api',
+            metadata
+        });
+    }
     async logSnapshotSave(snapshotName, tables, metadata = {}) {
         return this.recordEvent({
             actionType: 'snapshot_save',
@@ -73,6 +139,7 @@ class StateEventTracker {
     }
     async recordEvent(input) {
         const identity = await this.eventStore.allocateEventIdentity();
+        const metadata = input.metadata ?? {};
         const event = {
             eventId: identity.eventId,
             sequence: identity.sequence,
@@ -80,10 +147,14 @@ class StateEventTracker {
             actionType: input.actionType,
             entityName: input.entityName,
             affectedRecordId: input.affectedRecordId,
-            preStateSnapshotId: input.preStateSnapshotId ?? this.currentSnapshotId,
-            postStateSnapshotId: input.postStateSnapshotId ?? identity.eventId,
+            preStateSnapshotId: input.preStateSnapshotId ?? metadata.preStateSnapshotId ?? this.currentSnapshotId,
+            postStateSnapshotId: input.postStateSnapshotId ?? metadata.postStateSnapshotId ?? identity.eventId,
             mutationPayload: input.mutationPayload,
-            metadata: input.metadata
+            workflowSessionId: input.workflowSessionId ?? metadata.workflowSessionId,
+            retryChainId: input.retryChainId ?? metadata.retryChainId,
+            attemptNumber: input.attemptNumber ?? metadata.attemptNumber,
+            actionSource: input.actionSource ?? metadata.actionSource ?? metadata.source,
+            metadata
         };
         await this.eventStore.appendEvent(event);
         this.currentSnapshotId = event.postStateSnapshotId;

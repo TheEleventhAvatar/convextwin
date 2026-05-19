@@ -4,7 +4,6 @@ import { ActionEvent, ActionEventLogFile } from '../core/types';
 
 export class EventLogStore {
   private readonly filePath: string;
-  private loaded = false;
   private events: ActionEvent[] = [];
 
   constructor(baseDir: string = './logs', fileName: string = 'action-events.json') {
@@ -13,7 +12,7 @@ export class EventLogStore {
   }
 
   async listEvents(): Promise<ActionEvent[]> {
-    await this.load();
+    await this.reload();
     return [...this.events].sort((left, right) => {
       if (left.sequence !== right.sequence) {
         return left.sequence - right.sequence;
@@ -29,7 +28,7 @@ export class EventLogStore {
   }
 
   async allocateEventIdentity(): Promise<{ eventId: string; sequence: number }> {
-    await this.load();
+    await this.reload();
     const sequence = this.events.length + 1;
     return {
       sequence,
@@ -38,17 +37,14 @@ export class EventLogStore {
   }
 
   async appendEvent(event: ActionEvent): Promise<ActionEvent> {
-    await this.load();
+    await this.reload();
     this.events.push(event);
     await this.save();
     return event;
   }
 
-  private async load(): Promise<void> {
-    if (this.loaded) {
-      return;
-    }
-
+  private async reload(): Promise<void> {
+    this.events = [];
     if (await fs.pathExists(this.filePath)) {
       const raw = await fs.readJSON(this.filePath) as ActionEvent[] | ActionEventLogFile;
       this.events = Array.isArray(raw) ? raw : raw.events ?? [];
@@ -61,7 +57,6 @@ export class EventLogStore {
 
       return new Date(left.timestamp).getTime() - new Date(right.timestamp).getTime();
     });
-    this.loaded = true;
   }
 
   private async save(): Promise<void> {

@@ -4,8 +4,10 @@ import { AddressInfo } from 'net';
 import { EventLogStore } from '../events/event-log-store';
 import { StateEventTracker } from '../events/state-event-tracker';
 import { SnapshotManager } from '../snapshot/snapshot-manager';
-import { DatabaseSnapshot } from '../core/types';
+import { DatabaseSnapshot, ActionEvent } from '../core/types';
 import { MockDatabaseImpl } from '../runner/mock-database';
+import { WorkflowRunner, WorkflowScenarioName } from '../workflows/workflow-runner';
+import { validateReplay } from '../replay/replay-validator';
 
 interface TwinUIServerOptions {
   host?: string;
@@ -13,6 +15,12 @@ interface TwinUIServerOptions {
   snapshotName?: string;
   snapshotsDir?: string;
   logsDir?: string;
+  perturbations?: {
+    delayedWrites?: boolean;
+    artificialLatencyMs?: number;
+    staleReads?: boolean;
+    concurrentMutations?: boolean;
+  };
 }
 
 interface RequestBody {
@@ -23,6 +31,7 @@ export class TwinUIServer {
   private readonly snapshotManager: SnapshotManager;
   private readonly eventStore: EventLogStore;
   private readonly eventTracker: StateEventTracker;
+  private readonly workflowRunner: WorkflowRunner;
   private readonly host: string;
   private readonly port: number;
   private currentSnapshotName: string;
@@ -33,6 +42,11 @@ export class TwinUIServer {
     this.snapshotManager = new SnapshotManager(options.snapshotsDir);
     this.eventStore = new EventLogStore(options.logsDir ?? './logs');
     this.eventTracker = new StateEventTracker(this.eventStore, options.snapshotName ?? 'default');
+    this.workflowRunner = new WorkflowRunner({
+      snapshotsDir: options.snapshotsDir,
+      logsDir: options.logsDir,
+      perturbations: options.perturbations
+    });
     this.host = options.host ?? '127.0.0.1';
     this.port = options.port ?? 3000;
     this.currentSnapshotName = options.snapshotName ?? 'default';
@@ -116,6 +130,55 @@ export class TwinUIServer {
       return;
     }
 
+    if (req.method === 'GET' && pathname === '/api/workflows') {
+      const events = await this.eventStore.listEvents();
+      this.sendJson(res, 200, {
+        sessions: this.groupWorkflowSessions(events)
+      });
+      return;
+    }
+
+    const workflowMatch = pathname.match(/^\/api\/workflows\/([^/]+)$/);
+    if (req.method === 'POST' && workflowMatch) {
+      const scenarioName = decodeURIComponent(workflowMatch[1]) as WorkflowScenarioName;
+      const body = await this.readJsonBody(req);
+      const snapshotName = typeof body.snapshotName === 'string' && body.snapshotName.trim().length > 0
+        ? body.snapshotName.trim()
+        : this.currentSnapshotName;
+      const result = await this.workflowRunner.runScenario(scenarioName, snapshotName);
+      this.currentSnapshot = result.finalSnapshot;
+      this.currentSnapshotName = snapshotName;
+      this.sendJson(res, 200, result);
+      return;
+    }
+
+    if (req.method === 'POST' && pathname === '/api/replay/validate') {
+      const body = await this.readJsonBody(req);
+      const snapshotName = typeof body.snapshotName === 'string' && body.snapshotName.trim().length > 0
+        ? body.snapshotName.trim()
+        : this.currentSnapshotName;
+      const events = await this.filterReplayEvents(body);
+      const validation = await validateReplay(snapshotName, events, this.currentSnapshot, './snapshots');
+      const replayWorkflowSessionId = typeof body.workflowSessionId === 'string' && body.workflowSessionId.length > 0
+        ? body.workflowSessionId
+        : typeof body.retryChainId === 'string' && body.retryChainId.length > 0
+          ? body.retryChainId
+          : `replay_${Date.now()}`;
+      await this.eventTracker.logWorkflowStep(replayWorkflowSessionId, 'replay validation', {
+        matches: validation.matches,
+        divergenceMarkers: validation.divergenceMarkers
+      }, {
+        actionSource: 'replay',
+        metadata: {
+          workflowSessionId: body.workflowSessionId,
+          retryChainId: body.retryChainId,
+          conflictOnly: Boolean(body.conflictOnly)
+        }
+      });
+      this.sendJson(res, 200, validation);
+      return;
+    }
+
     if (req.method === 'GET' && pathname === '/api/snapshots') {
       const snapshots = await this.snapshotManager.listSnapshots();
       this.sendJson(res, 200, {
@@ -147,7 +210,7 @@ export class TwinUIServer {
 
       await this.snapshotManager.saveSnapshot(snapshotName, this.currentSnapshot.tables);
       await this.eventTracker.logSnapshotSave(snapshotName, this.currentSnapshot.tables, {
-        source: 'ui',
+        actionSource: 'browser',
         snapshotName
       });
       this.currentSnapshotName = snapshotName;
@@ -177,7 +240,7 @@ export class TwinUIServer {
         const record = await db.insert(tableName, body);
         this.applyDatabaseState(db);
         await this.eventTracker.logCreate(tableName, record, {
-          source: 'ui',
+          actionSource: 'browser',
           route: 'POST /api/tables/:table'
         });
 
@@ -197,7 +260,7 @@ export class TwinUIServer {
         const record = await db.patch(tableName, recordId, body);
         this.applyDatabaseState(db);
         await this.eventTracker.logUpdate(tableName, recordId, body, {
-          source: 'ui',
+          actionSource: 'browser',
           mode: 'patch',
           route: 'PATCH /api/tables/:table/:id'
         });
@@ -212,7 +275,7 @@ export class TwinUIServer {
         const record = await db.replace(tableName, recordId, body);
         this.applyDatabaseState(db);
         await this.eventTracker.logUpdate(tableName, recordId, body, {
-          source: 'ui',
+          actionSource: 'browser',
           mode: 'replace',
           route: 'PUT /api/tables/:table/:id'
         });
@@ -226,7 +289,7 @@ export class TwinUIServer {
         await db.delete(tableName, recordId);
         this.applyDatabaseState(db);
         await this.eventTracker.logDelete(tableName, recordId, {
-          source: 'ui',
+          actionSource: 'browser',
           route: 'DELETE /api/tables/:table/:id'
         });
 
@@ -242,7 +305,7 @@ export class TwinUIServer {
     this.currentSnapshot = await this.snapshotManager.loadSnapshot(snapshotName);
     this.currentSnapshotName = snapshotName;
     await this.eventTracker.logSnapshotLoad(snapshotName, {
-      source: 'ui',
+      actionSource: 'browser',
       snapshotName
     });
   }
@@ -257,6 +320,55 @@ export class TwinUIServer {
 
   private getTableRecords(tableName: string): Record<string, any>[] {
     return this.currentSnapshot.tables[tableName] ?? [];
+  }
+
+  private groupWorkflowSessions(events: ActionEvent[]): Array<{
+    workflowSessionId: string;
+    retryChainIds: string[];
+    conflictCount: number;
+    eventCount: number;
+    events: ActionEvent[];
+  }> {
+    const sessions = new Map<string, ActionEvent[]>();
+
+    for (const event of events) {
+      const sessionId = event.workflowSessionId ?? event.metadata?.workflowSessionId ?? 'ungrouped';
+      if (sessionId === 'ungrouped') {
+        continue;
+      }
+      const current = sessions.get(sessionId) ?? [];
+      current.push(event);
+      sessions.set(sessionId, current);
+    }
+
+    return [...sessions.entries()].map(([workflowSessionId, sessionEvents]) => ({
+      workflowSessionId,
+      retryChainIds: [...new Set(sessionEvents.map(event => event.retryChainId).filter((value): value is string => Boolean(value)))],
+      conflictCount: sessionEvents.filter(event => event.actionType === 'conflict').length,
+      eventCount: sessionEvents.length,
+      events: sessionEvents
+    })).sort((left, right) => {
+      const leftTime = left.events[0] ? new Date(left.events[0].timestamp).getTime() : 0;
+      const rightTime = right.events[0] ? new Date(right.events[0].timestamp).getTime() : 0;
+      return leftTime - rightTime;
+    });
+  }
+
+  private async filterReplayEvents(body: RequestBody): Promise<ActionEvent[]> {
+    const events = await this.eventStore.listEvents();
+    if (typeof body.workflowSessionId === 'string' && body.workflowSessionId) {
+      return events.filter(event => event.workflowSessionId === body.workflowSessionId || event.metadata?.workflowSessionId === body.workflowSessionId);
+    }
+
+    if (typeof body.retryChainId === 'string' && body.retryChainId) {
+      return events.filter(event => event.retryChainId === body.retryChainId || event.metadata?.retryChainId === body.retryChainId);
+    }
+
+    if (body.conflictOnly) {
+      return events.filter(event => event.actionType === 'conflict');
+    }
+
+    return events;
   }
 
   private sanitizeBody(body: RequestBody): RequestBody {
@@ -683,6 +795,30 @@ export class TwinUIServer {
           </div>
         </div>
       </section>
+
+      <section class="panel" style="margin-top: 16px;">
+        <header>
+          <h2>Reliability Workflows</h2>
+          <span class="meta" id="workflowCount">0 sessions</span>
+        </header>
+        <div class="body stack">
+          <div class="toolbar">
+            <button id="runConflictBtn">Run conflict</button>
+            <button id="runRetryBtn">Run retry</button>
+            <button id="runBrowserBtn">Run browser CRUD</button>
+            <button id="replaySessionBtn" class="secondary">Replay selected session</button>
+          </div>
+          <div class="timeline-grid">
+            <div class="timeline-list" id="workflowList"></div>
+            <div class="timeline-detail">
+              <div class="meta" id="workflowSelectionState">Select a workflow session</div>
+              <div class="detail-block">
+                <pre id="workflowDetail">No workflow selected.</pre>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
 
     <script>
@@ -693,7 +829,9 @@ export class TwinUIServer {
         currentTable: '',
         selectedRecordId: '',
         events: [],
-        selectedEventId: ''
+        selectedEventId: '',
+        workflowSessions: [],
+        selectedWorkflowSessionId: ''
       };
 
       const snapshotBadge = document.getElementById('snapshotBadge');
@@ -713,6 +851,14 @@ export class TwinUIServer {
       const eventList = document.getElementById('eventList');
       const eventSelectionState = document.getElementById('eventSelectionState');
       const eventDetail = document.getElementById('eventDetail');
+      const workflowCount = document.getElementById('workflowCount');
+      const workflowList = document.getElementById('workflowList');
+      const workflowSelectionState = document.getElementById('workflowSelectionState');
+      const workflowDetail = document.getElementById('workflowDetail');
+      const runConflictBtn = document.getElementById('runConflictBtn');
+      const runRetryBtn = document.getElementById('runRetryBtn');
+      const runBrowserBtn = document.getElementById('runBrowserBtn');
+      const replaySessionBtn = document.getElementById('replaySessionBtn');
 
       function setStatus(message) {
         statusText.textContent = message;
@@ -855,6 +1001,7 @@ export class TwinUIServer {
       }
 
       function renderTimeline() {
+        const grouped = groupEventsBySession();
         eventList.innerHTML = '';
         eventCount.textContent = state.events.length + ' events';
 
@@ -865,15 +1012,38 @@ export class TwinUIServer {
           return;
         }
 
-        for (const event of state.events) {
-          const button = document.createElement('button');
-          button.className = 'timeline-item' + (event.eventId === state.selectedEventId ? ' active' : '');
-          button.innerHTML = '<strong>' + event.actionType + '</strong> · ' + event.entityName + '<small>' + event.timestamp + (event.affectedRecordId ? ' · ' + event.affectedRecordId : '') + '</small>';
-          button.addEventListener('click', () => {
-            selectEvent(event.eventId);
+        for (const group of grouped) {
+          const groupHeader = document.createElement('button');
+          groupHeader.className = 'timeline-item' + (group.workflowSessionId === state.selectedWorkflowSessionId ? ' active' : '');
+          groupHeader.innerHTML = '<strong>' + group.workflowSessionId + '</strong><small>' + group.label + ' · ' + group.eventCount + ' events' + (group.retryChainIds.length > 0 ? ' · retries: ' + group.retryChainIds.join(', ') : '') + (group.conflictCount > 0 ? ' · conflicts: ' + group.conflictCount : '') + '</small>';
+          groupHeader.addEventListener('click', () => {
+            selectWorkflowSession(group.workflowSessionId);
           });
-          eventList.appendChild(button);
+          eventList.appendChild(groupHeader);
         }
+      }
+
+      function groupEventsBySession() {
+        const sessionMap = new Map();
+
+        for (const event of state.events) {
+          const workflowSessionId = event.workflowSessionId || (event.metadata && event.metadata.workflowSessionId) || 'ungrouped';
+          const current = sessionMap.get(workflowSessionId) || [];
+          current.push(event);
+          sessionMap.set(workflowSessionId, current);
+        }
+
+        return Array.from(sessionMap.entries()).map(([workflowSessionId, events]) => ({
+          workflowSessionId,
+          eventCount: events.length,
+          retryChainIds: Array.from(new Set(events.map(event => event.retryChainId).filter(Boolean))),
+          conflictCount: events.filter(event => event.actionType === 'conflict').length,
+          label: events.some(event => event.actionSource) ? Array.from(new Set(events.map(event => event.actionSource).filter(Boolean))).join(', ') : 'no source'
+        })).sort((left, right) => {
+          const leftTime = state.events.find(event => (event.workflowSessionId || (event.metadata && event.metadata.workflowSessionId) || 'ungrouped') === left.workflowSessionId);
+          const rightTime = state.events.find(event => (event.workflowSessionId || (event.metadata && event.metadata.workflowSessionId) || 'ungrouped') === right.workflowSessionId);
+          return new Date(leftTime ? leftTime.timestamp : 0).getTime() - new Date(rightTime ? rightTime.timestamp : 0).getTime();
+        });
       }
 
       async function selectEvent(eventId) {
@@ -888,6 +1058,7 @@ export class TwinUIServer {
         const payload = await api('/api/events/' + encodeURIComponent(eventId));
         const event = payload.event;
         state.selectedEventId = event.eventId;
+        state.selectedWorkflowSessionId = event.workflowSessionId || (event.metadata && event.metadata.workflowSessionId) || 'ungrouped';
         eventSelectionState.textContent = event.actionType + ' · ' + event.entityName + (event.affectedRecordId ? ' · ' + event.affectedRecordId : '');
         eventDetail.textContent = JSON.stringify({
           eventId: event.eventId,
@@ -897,10 +1068,64 @@ export class TwinUIServer {
           affectedRecordId: event.affectedRecordId,
           preStateSnapshotId: event.preStateSnapshotId,
           postStateSnapshotId: event.postStateSnapshotId,
+          workflowSessionId: event.workflowSessionId,
+          retryChainId: event.retryChainId,
+          attemptNumber: event.attemptNumber,
+          actionSource: event.actionSource,
           mutationPayload: event.mutationPayload,
           metadata: event.metadata
         }, null, 2);
         renderTimeline();
+      }
+
+      function renderWorkflows() {
+        workflowList.innerHTML = '';
+        workflowCount.textContent = state.workflowSessions.length + ' sessions';
+
+        if (state.workflowSessions.length === 0) {
+          workflowList.innerHTML = '<div class="empty">No workflow sessions yet.</div>';
+          workflowSelectionState.textContent = 'Select a workflow session';
+          workflowDetail.textContent = 'No workflow selected.';
+          return;
+        }
+
+        for (const session of state.workflowSessions) {
+          const button = document.createElement('button');
+          button.className = 'timeline-item' + (session.workflowSessionId === state.selectedWorkflowSessionId ? ' active' : '');
+          button.innerHTML = '<strong>' + session.workflowSessionId + '</strong><small>' + session.label + ' · ' + session.eventCount + ' events' + (session.retryChainIds.length > 0 ? ' · retries: ' + session.retryChainIds.join(', ') : '') + (session.conflictCount > 0 ? ' · conflicts: ' + session.conflictCount : '') + '</small>';
+          button.addEventListener('click', () => {
+            selectWorkflowSession(session.workflowSessionId);
+          });
+          workflowList.appendChild(button);
+        }
+      }
+
+      function selectWorkflowSession(workflowSessionId) {
+        state.selectedWorkflowSessionId = workflowSessionId;
+        const session = state.workflowSessions.find(item => item.workflowSessionId === workflowSessionId);
+        if (!session) {
+          workflowSelectionState.textContent = 'Select a workflow session';
+          workflowDetail.textContent = 'No workflow selected.';
+          renderWorkflows();
+          return;
+        }
+
+        workflowSelectionState.textContent = session.label + ' · ' + session.eventCount + ' events';
+        workflowDetail.textContent = JSON.stringify({
+          workflowSessionId: session.workflowSessionId,
+          retryChainIds: session.retryChainIds,
+          conflictCount: session.conflictCount,
+          eventCount: session.eventCount,
+          sessionMarkers: session.events.map(event => ({
+            eventId: event.eventId,
+            actionType: event.actionType,
+            actionSource: event.actionSource,
+            retryChainId: event.retryChainId,
+            attemptNumber: event.attemptNumber,
+            recordId: event.affectedRecordId
+          }))
+        }, null, 2);
+        renderWorkflows();
       }
 
       async function refreshState() {
@@ -908,6 +1133,7 @@ export class TwinUIServer {
         syncSnapshotMeta(payload);
         renderAll();
         await refreshEvents();
+        await refreshWorkflows();
       }
 
       async function refreshEvents() {
@@ -927,6 +1153,54 @@ export class TwinUIServer {
 
         renderTimeline();
         await selectEvent(state.selectedEventId);
+      }
+
+      async function refreshWorkflows() {
+        const payload = await api('/api/workflows');
+        state.workflowSessions = payload.sessions || [];
+
+        if (state.workflowSessions.length === 0) {
+          state.selectedWorkflowSessionId = '';
+          renderWorkflows();
+          return;
+        }
+
+        const selectedExists = state.selectedWorkflowSessionId && state.workflowSessions.some(session => session.workflowSessionId === state.selectedWorkflowSessionId);
+        if (!selectedExists) {
+          state.selectedWorkflowSessionId = state.workflowSessions[state.workflowSessions.length - 1].workflowSessionId;
+        }
+
+        renderWorkflows();
+        selectWorkflowSession(state.selectedWorkflowSessionId);
+      }
+
+      async function runWorkflowScenario(scenarioName) {
+        const payload = await api('/api/workflows/' + encodeURIComponent(scenarioName), {
+          method: 'POST',
+          body: JSON.stringify({ snapshotName: state.snapshotName || 'default' })
+        });
+
+        setStatus('Ran workflow: ' + scenarioName + '.');
+        state.selectedWorkflowSessionId = payload.workflowSessionId;
+        await refreshState();
+      }
+
+      async function replaySelectedWorkflow() {
+        if (!state.selectedWorkflowSessionId) {
+          setStatus('Select a workflow session first.');
+          return;
+        }
+
+        const payload = await api('/api/replay/validate', {
+          method: 'POST',
+          body: JSON.stringify({
+            snapshotName: state.snapshotName || 'default',
+            workflowSessionId: state.selectedWorkflowSessionId
+          })
+        });
+
+        workflowDetail.textContent = JSON.stringify(payload, null, 2);
+        setStatus(payload.matches ? 'Replay matched current state.' : 'Replay divergence detected.');
       }
 
       async function loadSnapshot() {
@@ -1015,6 +1289,10 @@ export class TwinUIServer {
         setStatus('Ready for a new record.');
       });
       deleteRecordBtn.addEventListener('click', deleteSelectedRecord);
+      runConflictBtn.addEventListener('click', () => runWorkflowScenario('concurrent-update-conflict'));
+      runRetryBtn.addEventListener('click', () => runWorkflowScenario('retry-after-partial-failure'));
+      runBrowserBtn.addEventListener('click', () => runWorkflowScenario('browser-agent-crud'));
+      replaySessionBtn.addEventListener('click', replaySelectedWorkflow);
 
       refreshState().catch(error => {
         snapshotBadge.textContent = 'Failed to load snapshot';
