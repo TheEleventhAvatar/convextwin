@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: convex-twin-ui
+    env: docker
+    branch: main
+    plan: free
+    dockerfilePath: Dockerfile
+    buildCommand: npm ci
+    startCommand: npx ts-node scripts/start-ui-perturb.ts --port 3000 --delayedWrites --staleReads --concurrentMutations --latency 1200
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: SNAPSHOTS_DIR
+        value: /data/snapshots
+      - key: LOGS_DIR
+        value: /data/logs
+    ports:
+      - 3000

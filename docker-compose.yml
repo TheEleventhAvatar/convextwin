@@ -1,0 +1,12 @@
+version: '3.8'
+services:
+  convex-twin-ui:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
+    volumes:
+      - ./snapshots:/app/snapshots:rw
+      - ./logs:/app/logs:rw

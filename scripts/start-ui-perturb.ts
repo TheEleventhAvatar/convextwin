@@ -19,7 +19,9 @@ function parseArgs() {
     delayedWrites: has('delayedWrites'),
     staleReads: has('staleReads'),
     concurrentMutations: has('concurrentMutations'),
-    artificialLatencyMs: Number(get('latency', '0'))
+    artificialLatencyMs: Number(get('latency', '0')),
+    snapshotsDir: process.env.SNAPSHOTS_DIR || get('snapshotsDir', './snapshots'),
+    logsDir: process.env.LOGS_DIR || get('logsDir', './logs')
   };
 }
 
@@ -30,6 +32,8 @@ async function main() {
     port: opts.port,
     host: opts.host,
     snapshotName: opts.snapshot,
+    snapshotsDir: opts.snapshotsDir,
+    logsDir: opts.logsDir,
     perturbations: {
       delayedWrites: opts.delayedWrites,
       staleReads: opts.staleReads,
