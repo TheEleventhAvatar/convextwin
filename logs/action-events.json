@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "updatedAt": "2026-05-19T11:38:15.967Z",
+  "updatedAt": "2026-05-19T15:16:02.232Z",
   "events": [
     {
       "eventId": "evt_000001",
@@ -1045,6 +1045,1171 @@
           "workflowSessionId": "concurrent-update-conflict_1779190620193_s92m8b",
           "conflictOnly": false
         }
+      }
+    },
+    {
+      "eventId": "evt_000043",
+      "sequence": 43,
+      "timestamp": "2026-05-19T15:12:14.733Z",
+      "actionType": "snapshot_load",
+      "entityName": "snapshot",
+      "affectedRecordId": "default",
+      "preStateSnapshotId": "default",
+      "postStateSnapshotId": "default",
+      "mutationPayload": {
+        "snapshotName": "default"
+      },
+      "actionSource": "browser",
+      "metadata": {
+        "actionSource": "browser",
+        "snapshotName": "default"
+      }
+    },
+    {
+      "eventId": "evt_000044",
+      "sequence": 44,
+      "timestamp": "2026-05-19T15:14:25.336Z",
+      "actionType": "update",
+      "entityName": "messages",
+      "affectedRecordId": "msg_456",
+      "preStateSnapshotId": "default",
+      "postStateSnapshotId": "evt_000044",
+      "mutationPayload": {
+        "recordId": "msg_456",
+        "changes": {
+          "userId": "user_123",
+          "text": "Hello, world!",
+          "channel": "general"
+        },
+        "mode": "patch"
+      },
+      "actionSource": "browser",
+      "metadata": {
+        "actionSource": "browser",
+        "mode": "patch",
+        "route": "PATCH /api/tables/:table/:id"
+      }
+    },
+    {
+      "eventId": "evt_000045",
+      "sequence": 45,
+      "timestamp": "2026-05-19T15:14:31.603Z",
+      "actionType": "snapshot_load",
+      "entityName": "snapshot",
+      "affectedRecordId": "default",
+      "preStateSnapshotId": "evt_000044",
+      "postStateSnapshotId": "default",
+      "mutationPayload": {
+        "snapshotName": "default"
+      },
+      "actionSource": "browser",
+      "metadata": {
+        "actionSource": "browser",
+        "snapshotName": "default"
+      }
+    },
+    {
+      "eventId": "evt_000046",
+      "sequence": 46,
+      "timestamp": "2026-05-19T15:14:33.368Z",
+      "actionType": "snapshot_save",
+      "entityName": "snapshot",
+      "affectedRecordId": "default",
+      "preStateSnapshotId": "default",
+      "postStateSnapshotId": "default",
+      "mutationPayload": {
+        "snapshotName": "default",
+        "tableCount": 2,
+        "recordCount": 2
+      },
+      "actionSource": "browser",
+      "metadata": {
+        "actionSource": "browser",
+        "snapshotName": "default"
+      }
+    },
+    {
+      "eventId": "evt_000047",
+      "sequence": 47,
+      "timestamp": "2026-05-19T15:14:38.659Z",
+      "actionType": "snapshot_load",
+      "entityName": "snapshot",
+      "affectedRecordId": "default",
+      "preStateSnapshotId": "default",
+      "postStateSnapshotId": "default",
+      "mutationPayload": {
+        "snapshotName": "default"
+      },
+      "actionSource": "browser",
+      "metadata": {
+        "actionSource": "browser",
+        "snapshotName": "default"
+      }
+    },
+    {
+      "eventId": "evt_000048",
+      "sequence": 48,
+      "timestamp": "2026-05-19T15:15:00.219Z",
+      "actionType": "update",
+      "entityName": "users",
+      "affectedRecordId": "user_123",
+      "preStateSnapshotId": "default",
+      "postStateSnapshotId": "evt_000048",
+      "mutationPayload": {
+        "recordId": "user_123",
+        "changes": {
+          "name": "John Doe",
+          "email": "john@example.com"
+        },
+        "mode": "patch"
+      },
+      "actionSource": "browser",
+      "metadata": {
+        "actionSource": "browser",
+        "mode": "patch",
+        "route": "PATCH /api/tables/:table/:id"
+      }
+    },
+    {
+      "eventId": "evt_000049",
+      "sequence": 49,
+      "timestamp": "2026-05-19T15:15:05.833Z",
+      "actionType": "workflow_step",
+      "entityName": "workflow",
+      "affectedRecordId": "browser-agent-crud_1779190695909_k1blck",
+      "preStateSnapshotId": "evt_000048",
+      "postStateSnapshotId": "evt_000049",
+      "mutationPayload": {
+        "workflowSessionId": "browser-agent-crud_1779190695909_k1blck",
+        "stepName": "replay validation",
+        "payload": {
+          "matches": true,
+          "divergenceMarkers": []
+        }
+      },
+      "workflowSessionId": "browser-agent-crud_1779190695909_k1blck",
+      "actionSource": "replay",
+      "metadata": {
+        "actionSource": "replay",
+        "metadata": {
+          "workflowSessionId": "browser-agent-crud_1779190695909_k1blck",
+          "conflictOnly": false
+        }
+      }
+    },
+    {
+      "eventId": "evt_000050",
+      "sequence": 50,
+      "timestamp": "2026-05-19T15:15:12.797Z",
+      "actionType": "workflow_start",
+      "entityName": "workflow",
+      "affectedRecordId": "browser-agent-crud_1779203712792_6sw8ib",
+      "preStateSnapshotId": "default",
+      "postStateSnapshotId": "evt_000050",
+      "mutationPayload": {
+        "workflowSessionId": "browser-agent-crud_1779203712792_6sw8ib",
+        "workflowName": "browser agent crud"
+      },
+      "workflowSessionId": "browser-agent-crud_1779203712792_6sw8ib",
+      "actionSource": "simulated-agent",
+      "metadata": {
+        "actionSource": "simulated-agent"
+      }
+    },
+    {
+      "eventId": "evt_000051",
+      "sequence": 51,
+      "timestamp": "2026-05-19T15:15:12.815Z",
+      "actionType": "workflow_step",
+      "entityName": "workflow",
+      "affectedRecordId": "browser-agent-crud_1779203712792_6sw8ib",
+      "preStateSnapshotId": "evt_000050",
+      "postStateSnapshotId": "evt_000051",
+      "mutationPayload": {
+        "workflowSessionId": "browser-agent-crud_1779203712792_6sw8ib",
+        "stepName": "login",
+        "payload": {
+          "user": "browser-agent"
+        }
+      },
+      "workflowSessionId": "browser-agent-crud_1779203712792_6sw8ib",
+      "actionSource": "browser",
+      "metadata": {
+        "actionSource": "browser",
+        "metadata": {
+          "workflowSessionId": "browser-agent-crud_1779203712792_6sw8ib",
+          "source": "browser"
+        }
+      }
+    },
+    {
+      "eventId": "evt_000052",
+      "sequence": 52,
+      "timestamp": "2026-05-19T15:15:12.820Z",
+      "actionType": "create",
+      "entityName": "users",
+      "affectedRecordId": "3d2ym07ovzb6rnzzqsqi2c",
+      "preStateSnapshotId": "evt_000051",
+      "postStateSnapshotId": "evt_000052",
+      "mutationPayload": {
+        "record": {
+          "_id": "3d2ym07ovzb6rnzzqsqi2c",
+          "_creationTime": 1779203712818,
+          "name": "Agent Created",
+          "email": "agent@example.com"
+        }
+      },
+      "workflowSessionId": "browser-agent-crud_1779203712792_6sw8ib",
+      "actionSource": "browser",
+      "metadata": {
+        "workflowSessionId": "browser-agent-crud_1779203712792_6sw8ib",
+        "actionSource": "browser",
+        "metadata": {
+          "workflowSessionId": "browser-agent-crud_1779203712792_6sw8ib",
+          "source": "browser",
+          "step": "create record"
+        }
+      }
+    },
+    {
+      "eventId": "evt_000053",
+      "sequence": 53,
+      "timestamp": "2026-05-19T15:15:12.829Z",
+      "actionType": "update",
+      "entityName": "users",
+      "affectedRecordId": "3d2ym07ovzb6rnzzqsqi2c",
+      "preStateSnapshotId": "evt_000052",
+      "postStateSnapshotId": "evt_000053",
+      "mutationPayload": {
+        "recordId": "3d2ym07ovzb6rnzzqsqi2c",
+        "changes": {
+          "name": "Agent Edited"
+        },
+        "mode": "patch"
+      },
+      "workflowSessionId": "browser-agent-crud_1779203712792_6sw8ib",
+      "actionSource": "browser",
+      "metadata": {
+        "workflowSessionId": "browser-agent-crud_1779203712792_6sw8ib",
+        "actionSource": "browser",
+        "metadata": {
+          "workflowSessionId": "browser-agent-crud_1779203712792_6sw8ib",
+          "source": "browser",
+          "step": "edit record"
+        }
+      }
+    },
+    {
+      "eventId": "evt_000054",
+      "sequence": 54,
+      "timestamp": "2026-05-19T15:15:12.834Z",
+      "actionType": "delete",
+      "entityName": "users",
+      "affectedRecordId": "3d2ym07ovzb6rnzzqsqi2c",
+      "preStateSnapshotId": "evt_000053",
+      "postStateSnapshotId": "evt_000054",
+      "mutationPayload": {
+        "recordId": "3d2ym07ovzb6rnzzqsqi2c"
+      },
+      "workflowSessionId": "browser-agent-crud_1779203712792_6sw8ib",
+      "actionSource": "browser",
+      "metadata": {
+        "workflowSessionId": "browser-agent-crud_1779203712792_6sw8ib",
+        "actionSource": "browser",
+        "metadata": {
+          "workflowSessionId": "browser-agent-crud_1779203712792_6sw8ib",
+          "source": "browser",
+          "step": "delete record"
+        }
+      }
+    },
+    {
+      "eventId": "evt_000055",
+      "sequence": 55,
+      "timestamp": "2026-05-19T15:15:12.840Z",
+      "actionType": "workflow_end",
+      "entityName": "workflow",
+      "affectedRecordId": "browser-agent-crud_1779203712792_6sw8ib",
+      "preStateSnapshotId": "evt_000054",
+      "postStateSnapshotId": "evt_000055",
+      "mutationPayload": {
+        "workflowSessionId": "browser-agent-crud_1779203712792_6sw8ib",
+        "workflowName": "browser agent crud"
+      },
+      "workflowSessionId": "browser-agent-crud_1779203712792_6sw8ib",
+      "actionSource": "browser",
+      "metadata": {
+        "actionSource": "browser"
+      }
+    },
+    {
+      "eventId": "evt_000056",
+      "sequence": 56,
+      "timestamp": "2026-05-19T15:15:17.654Z",
+      "actionType": "workflow_start",
+      "entityName": "workflow",
+      "affectedRecordId": "retry-after-partial-failure_1779203717651_1p7zq2",
+      "preStateSnapshotId": "default",
+      "postStateSnapshotId": "evt_000056",
+      "mutationPayload": {
+        "workflowSessionId": "retry-after-partial-failure_1779203717651_1p7zq2",
+        "workflowName": "retry after partial failure"
+      },
+      "workflowSessionId": "retry-after-partial-failure_1779203717651_1p7zq2",
+      "actionSource": "simulated-agent",
+      "metadata": {
+        "actionSource": "simulated-agent"
+      }
+    },
+    {
+      "eventId": "evt_000057",
+      "sequence": 57,
+      "timestamp": "2026-05-19T15:15:18.741Z",
+      "actionType": "workflow_start",
+      "entityName": "workflow",
+      "affectedRecordId": "retry-after-partial-failure_1779203718738_od08pu",
+      "preStateSnapshotId": "default",
+      "postStateSnapshotId": "evt_000057",
+      "mutationPayload": {
+        "workflowSessionId": "retry-after-partial-failure_1779203718738_od08pu",
+        "workflowName": "retry after partial failure"
+      },
+      "workflowSessionId": "retry-after-partial-failure_1779203718738_od08pu",
+      "actionSource": "simulated-agent",
+      "metadata": {
+        "actionSource": "simulated-agent"
+      }
+    },
+    {
+      "eventId": "evt_000058",
+      "sequence": 58,
+      "timestamp": "2026-05-19T15:15:18.860Z",
+      "actionType": "retry",
+      "entityName": "messages",
+      "affectedRecordId": "msg_456",
+      "preStateSnapshotId": "evt_000057",
+      "postStateSnapshotId": "evt_000058",
+      "mutationPayload": {
+        "recordId": "msg_456",
+        "payload": {
+          "text": "Retry completed message",
+          "status": "confirmed"
+        }
+      },
+      "workflowSessionId": "retry-after-partial-failure_1779203717651_1p7zq2",
+      "retryChainId": "retry_1779203717658_hl8sa5",
+      "attemptNumber": 1,
+      "actionSource": "api",
+      "metadata": {
+        "workflowSessionId": "retry-after-partial-failure_1779203717651_1p7zq2",
+        "retryChainId": "retry_1779203717658_hl8sa5",
+        "attemptNumber": 1,
+        "actionSource": "api",
+        "metadata": {
+          "stage": "partial-failure",
+          "partialSuccess": true
+        }
+      }
+    },
+    {
+      "eventId": "evt_000059",
+      "sequence": 59,
+      "timestamp": "2026-05-19T15:15:18.865Z",
+      "actionType": "workflow_step",
+      "entityName": "workflow",
+      "affectedRecordId": "retry-after-partial-failure_1779203717651_1p7zq2",
+      "preStateSnapshotId": "evt_000058",
+      "postStateSnapshotId": "evt_000059",
+      "mutationPayload": {
+        "workflowSessionId": "retry-after-partial-failure_1779203717651_1p7zq2",
+        "stepName": "partial mutation completed",
+        "payload": {
+          "text": "Retry completed message",
+          "status": "confirmed"
+        }
+      },
+      "workflowSessionId": "retry-after-partial-failure_1779203717651_1p7zq2",
+      "retryChainId": "retry_1779203717658_hl8sa5",
+      "attemptNumber": 1,
+      "actionSource": "simulated-agent",
+      "metadata": {
+        "actionSource": "simulated-agent",
+        "retryChainId": "retry_1779203717658_hl8sa5",
+        "attemptNumber": 1,
+        "metadata": {
+          "partialFailure": true
+        }
+      }
+    },
+    {
+      "eventId": "evt_000060",
+      "sequence": 60,
+      "timestamp": "2026-05-19T15:15:19.436Z",
+      "actionType": "workflow_start",
+      "entityName": "workflow",
+      "affectedRecordId": "concurrent-update-conflict_1779203719433_9li6dq",
+      "preStateSnapshotId": "default",
+      "postStateSnapshotId": "evt_000060",
+      "mutationPayload": {
+        "workflowSessionId": "concurrent-update-conflict_1779203719433_9li6dq",
+        "workflowName": "concurrent update conflict"
+      },
+      "workflowSessionId": "concurrent-update-conflict_1779203719433_9li6dq",
+      "actionSource": "simulated-agent",
+      "metadata": {
+        "actionSource": "simulated-agent"
+      }
+    },
+    {
+      "eventId": "evt_000061",
+      "sequence": 61,
+      "timestamp": "2026-05-19T15:15:19.947Z",
+      "actionType": "retry",
+      "entityName": "messages",
+      "affectedRecordId": "msg_456",
+      "preStateSnapshotId": "evt_000060",
+      "postStateSnapshotId": "evt_000061",
+      "mutationPayload": {
+        "recordId": "msg_456",
+        "payload": {
+          "text": "Retry completed message",
+          "status": "confirmed"
+        }
+      },
+      "workflowSessionId": "retry-after-partial-failure_1779203718738_od08pu",
+      "retryChainId": "retry_1779203718744_bo0t26",
+      "attemptNumber": 1,
+      "actionSource": "api",
+      "metadata": {
+        "workflowSessionId": "retry-after-partial-failure_1779203718738_od08pu",
+        "retryChainId": "retry_1779203718744_bo0t26",
+        "attemptNumber": 1,
+        "actionSource": "api",
+        "metadata": {
+          "stage": "partial-failure",
+          "partialSuccess": true
+        }
+      }
+    },
+    {
+      "eventId": "evt_000062",
+      "sequence": 62,
+      "timestamp": "2026-05-19T15:15:19.952Z",
+      "actionType": "workflow_step",
+      "entityName": "workflow",
+      "affectedRecordId": "retry-after-partial-failure_1779203718738_od08pu",
+      "preStateSnapshotId": "evt_000061",
+      "postStateSnapshotId": "evt_000062",
+      "mutationPayload": {
+        "workflowSessionId": "retry-after-partial-failure_1779203718738_od08pu",
+        "stepName": "partial mutation completed",
+        "payload": {
+          "text": "Retry completed message",
+          "status": "confirmed"
+        }
+      },
+      "workflowSessionId": "retry-after-partial-failure_1779203718738_od08pu",
+      "retryChainId": "retry_1779203718744_bo0t26",
+      "attemptNumber": 1,
+      "actionSource": "simulated-agent",
+      "metadata": {
+        "actionSource": "simulated-agent",
+        "retryChainId": "retry_1779203718744_bo0t26",
+        "attemptNumber": 1,
+        "metadata": {
+          "partialFailure": true
+        }
+      }
+    },
+    {
+      "eventId": "evt_000063",
+      "sequence": 63,
+      "timestamp": "2026-05-19T15:15:20.073Z",
+      "actionType": "retry",
+      "entityName": "messages",
+      "affectedRecordId": "msg_456",
+      "preStateSnapshotId": "evt_000062",
+      "postStateSnapshotId": "evt_000063",
+      "mutationPayload": {
+        "recordId": "msg_456",
+        "payload": {
+          "text": "Retry completed message",
+          "status": "confirmed"
+        }
+      },
+      "workflowSessionId": "retry-after-partial-failure_1779203717651_1p7zq2",
+      "retryChainId": "retry_1779203717658_hl8sa5",
+      "attemptNumber": 2,
+      "actionSource": "api",
+      "metadata": {
+        "workflowSessionId": "retry-after-partial-failure_1779203717651_1p7zq2",
+        "retryChainId": "retry_1779203717658_hl8sa5",
+        "attemptNumber": 2,
+        "actionSource": "api",
+        "metadata": {
+          "stage": "retry",
+          "success": true
+        }
+      }
+    },
+    {
+      "eventId": "evt_000064",
+      "sequence": 64,
+      "timestamp": "2026-05-19T15:15:20.131Z",
+      "actionType": "update",
+      "entityName": "messages",
+      "affectedRecordId": "msg_456",
+      "preStateSnapshotId": "evt_000063",
+      "postStateSnapshotId": "evt_000064",
+      "mutationPayload": {
+        "recordId": "msg_456",
+        "changes": {
+          "text": "Retry completed message",
+          "status": "confirmed"
+        },
+        "mode": "patch"
+      },
+      "workflowSessionId": "retry-after-partial-failure_1779203717651_1p7zq2",
+      "retryChainId": "retry_1779203717658_hl8sa5",
+      "attemptNumber": 2,
+      "actionSource": "api",
+      "metadata": {
+        "workflowSessionId": "retry-after-partial-failure_1779203717651_1p7zq2",
+        "retryChainId": "retry_1779203717658_hl8sa5",
+        "attemptNumber": 2,
+        "actionSource": "api",
+        "metadata": {
+          "retry": true
+        }
+      }
+    },
+    {
+      "eventId": "evt_000065",
+      "sequence": 65,
+      "timestamp": "2026-05-19T15:15:20.138Z",
+      "actionType": "workflow_end",
+      "entityName": "workflow",
+      "affectedRecordId": "retry-after-partial-failure_1779203717651_1p7zq2",
+      "preStateSnapshotId": "evt_000064",
+      "postStateSnapshotId": "evt_000065",
+      "mutationPayload": {
+        "workflowSessionId": "retry-after-partial-failure_1779203717651_1p7zq2",
+        "workflowName": "retry after partial failure"
+      },
+      "workflowSessionId": "retry-after-partial-failure_1779203717651_1p7zq2",
+      "actionSource": "simulated-agent",
+      "metadata": {
+        "actionSource": "simulated-agent"
+      }
+    },
+    {
+      "eventId": "evt_000066",
+      "sequence": 66,
+      "timestamp": "2026-05-19T15:15:20.644Z",
+      "actionType": "update",
+      "entityName": "users",
+      "affectedRecordId": "user_123",
+      "preStateSnapshotId": "stale-read",
+      "postStateSnapshotId": "evt_000066",
+      "mutationPayload": {
+        "recordId": "user_123",
+        "changes": {
+          "name": "John Doe (fresh)"
+        },
+        "mode": "patch"
+      },
+      "workflowSessionId": "concurrent-update-conflict_1779203719433_9li6dq",
+      "actionSource": "api",
+      "metadata": {
+        "workflowSessionId": "concurrent-update-conflict_1779203719433_9li6dq",
+        "actionSource": "api",
+        "preStateSnapshotId": "stale-read",
+        "metadata": {
+          "client": "client-a",
+          "readVersion": 1777659912593
+        }
+      }
+    },
+    {
+      "eventId": "evt_000067",
+      "sequence": 67,
+      "timestamp": "2026-05-19T15:15:21.159Z",
+      "actionType": "retry",
+      "entityName": "messages",
+      "affectedRecordId": "msg_456",
+      "preStateSnapshotId": "evt_000066",
+      "postStateSnapshotId": "evt_000067",
+      "mutationPayload": {
+        "recordId": "msg_456",
+        "payload": {
+          "text": "Retry completed message",
+          "status": "confirmed"
+        }
+      },
+      "workflowSessionId": "retry-after-partial-failure_1779203718738_od08pu",
+      "retryChainId": "retry_1779203718744_bo0t26",
+      "attemptNumber": 2,
+      "actionSource": "api",
+      "metadata": {
+        "workflowSessionId": "retry-after-partial-failure_1779203718738_od08pu",
+        "retryChainId": "retry_1779203718744_bo0t26",
+        "attemptNumber": 2,
+        "actionSource": "api",
+        "metadata": {
+          "stage": "retry",
+          "success": true
+        }
+      }
+    },
+    {
+      "eventId": "evt_000068",
+      "sequence": 68,
+      "timestamp": "2026-05-19T15:15:21.165Z",
+      "actionType": "update",
+      "entityName": "messages",
+      "affectedRecordId": "msg_456",
+      "preStateSnapshotId": "evt_000067",
+      "postStateSnapshotId": "evt_000068",
+      "mutationPayload": {
+        "recordId": "msg_456",
+        "changes": {
+          "text": "Retry completed message",
+          "status": "confirmed"
+        },
+        "mode": "patch"
+      },
+      "workflowSessionId": "retry-after-partial-failure_1779203718738_od08pu",
+      "retryChainId": "retry_1779203718744_bo0t26",
+      "attemptNumber": 2,
+      "actionSource": "api",
+      "metadata": {
+        "workflowSessionId": "retry-after-partial-failure_1779203718738_od08pu",
+        "retryChainId": "retry_1779203718744_bo0t26",
+        "attemptNumber": 2,
+        "actionSource": "api",
+        "metadata": {
+          "retry": true
+        }
+      }
+    },
+    {
+      "eventId": "evt_000069",
+      "sequence": 69,
+      "timestamp": "2026-05-19T15:15:21.169Z",
+      "actionType": "workflow_end",
+      "entityName": "workflow",
+      "affectedRecordId": "retry-after-partial-failure_1779203718738_od08pu",
+      "preStateSnapshotId": "evt_000068",
+      "postStateSnapshotId": "evt_000069",
+      "mutationPayload": {
+        "workflowSessionId": "retry-after-partial-failure_1779203718738_od08pu",
+        "workflowName": "retry after partial failure"
+      },
+      "workflowSessionId": "retry-after-partial-failure_1779203718738_od08pu",
+      "actionSource": "simulated-agent",
+      "metadata": {
+        "actionSource": "simulated-agent"
+      }
+    },
+    {
+      "eventId": "evt_000070",
+      "sequence": 70,
+      "timestamp": "2026-05-19T15:15:21.851Z",
+      "actionType": "conflict",
+      "entityName": "users",
+      "affectedRecordId": "user_123",
+      "preStateSnapshotId": "evt_000069",
+      "postStateSnapshotId": "evt_000070",
+      "mutationPayload": {
+        "recordId": "user_123",
+        "stalePayload": {
+          "_id": "user_123",
+          "_creationTime": 1777659912593,
+          "name": "John Doe (stale)",
+          "email": "john@example.com"
+        },
+        "reason": "stale_write"
+      },
+      "workflowSessionId": "concurrent-update-conflict_1779203719433_9li6dq",
+      "actionSource": "api",
+      "metadata": {
+        "workflowSessionId": "concurrent-update-conflict_1779203719433_9li6dq",
+        "actionSource": "api",
+        "reason": "stale_write",
+        "metadata": {
+          "client": "client-b",
+          "observedName": "John Doe",
+          "latestName": "John Doe (fresh)"
+        }
+      }
+    },
+    {
+      "eventId": "evt_000071",
+      "sequence": 71,
+      "timestamp": "2026-05-19T15:15:21.856Z",
+      "actionType": "update",
+      "entityName": "users",
+      "affectedRecordId": "user_123",
+      "preStateSnapshotId": "evt_000070",
+      "postStateSnapshotId": "evt_000071",
+      "mutationPayload": {
+        "recordId": "user_123",
+        "changes": {
+          "_id": "user_123",
+          "_creationTime": 1777659912593,
+          "name": "John Doe (stale)",
+          "email": "john@example.com"
+        },
+        "mode": "patch"
+      },
+      "workflowSessionId": "concurrent-update-conflict_1779203719433_9li6dq",
+      "actionSource": "api",
+      "metadata": {
+        "workflowSessionId": "concurrent-update-conflict_1779203719433_9li6dq",
+        "actionSource": "api",
+        "metadata": {
+          "client": "client-b",
+          "stale": true,
+          "divergence": true
+        }
+      }
+    },
+    {
+      "eventId": "evt_000072",
+      "sequence": 72,
+      "timestamp": "2026-05-19T15:15:21.860Z",
+      "actionType": "workflow_end",
+      "entityName": "workflow",
+      "affectedRecordId": "concurrent-update-conflict_1779203719433_9li6dq",
+      "preStateSnapshotId": "evt_000071",
+      "postStateSnapshotId": "evt_000072",
+      "mutationPayload": {
+        "workflowSessionId": "concurrent-update-conflict_1779203719433_9li6dq",
+        "workflowName": "concurrent update conflict"
+      },
+      "workflowSessionId": "concurrent-update-conflict_1779203719433_9li6dq",
+      "actionSource": "simulated-agent",
+      "metadata": {
+        "actionSource": "simulated-agent"
+      }
+    },
+    {
+      "eventId": "evt_000073",
+      "sequence": 73,
+      "timestamp": "2026-05-19T15:15:22.949Z",
+      "actionType": "workflow_start",
+      "entityName": "workflow",
+      "affectedRecordId": "retry-after-partial-failure_1779203722946_82drhw",
+      "preStateSnapshotId": "default",
+      "postStateSnapshotId": "evt_000073",
+      "mutationPayload": {
+        "workflowSessionId": "retry-after-partial-failure_1779203722946_82drhw",
+        "workflowName": "retry after partial failure"
+      },
+      "workflowSessionId": "retry-after-partial-failure_1779203722946_82drhw",
+      "actionSource": "simulated-agent",
+      "metadata": {
+        "actionSource": "simulated-agent"
+      }
+    },
+    {
+      "eventId": "evt_000074",
+      "sequence": 74,
+      "timestamp": "2026-05-19T15:15:24.156Z",
+      "actionType": "retry",
+      "entityName": "messages",
+      "affectedRecordId": "msg_456",
+      "preStateSnapshotId": "evt_000073",
+      "postStateSnapshotId": "evt_000074",
+      "mutationPayload": {
+        "recordId": "msg_456",
+        "payload": {
+          "text": "Retry completed message",
+          "status": "confirmed"
+        }
+      },
+      "workflowSessionId": "retry-after-partial-failure_1779203722946_82drhw",
+      "retryChainId": "retry_1779203722952_inecsq",
+      "attemptNumber": 1,
+      "actionSource": "api",
+      "metadata": {
+        "workflowSessionId": "retry-after-partial-failure_1779203722946_82drhw",
+        "retryChainId": "retry_1779203722952_inecsq",
+        "attemptNumber": 1,
+        "actionSource": "api",
+        "metadata": {
+          "stage": "partial-failure",
+          "partialSuccess": true
+        }
+      }
+    },
+    {
+      "eventId": "evt_000075",
+      "sequence": 75,
+      "timestamp": "2026-05-19T15:15:24.167Z",
+      "actionType": "workflow_step",
+      "entityName": "workflow",
+      "affectedRecordId": "retry-after-partial-failure_1779203722946_82drhw",
+      "preStateSnapshotId": "evt_000074",
+      "postStateSnapshotId": "evt_000075",
+      "mutationPayload": {
+        "workflowSessionId": "retry-after-partial-failure_1779203722946_82drhw",
+        "stepName": "partial mutation completed",
+        "payload": {
+          "text": "Retry completed message",
+          "status": "confirmed"
+        }
+      },
+      "workflowSessionId": "retry-after-partial-failure_1779203722946_82drhw",
+      "retryChainId": "retry_1779203722952_inecsq",
+      "attemptNumber": 1,
+      "actionSource": "simulated-agent",
+      "metadata": {
+        "actionSource": "simulated-agent",
+        "retryChainId": "retry_1779203722952_inecsq",
+        "attemptNumber": 1,
+        "metadata": {
+          "partialFailure": true
+        }
+      }
+    },
+    {
+      "eventId": "evt_000076",
+      "sequence": 76,
+      "timestamp": "2026-05-19T15:15:25.375Z",
+      "actionType": "retry",
+      "entityName": "messages",
+      "affectedRecordId": "msg_456",
+      "preStateSnapshotId": "evt_000075",
+      "postStateSnapshotId": "evt_000076",
+      "mutationPayload": {
+        "recordId": "msg_456",
+        "payload": {
+          "text": "Retry completed message",
+          "status": "confirmed"
+        }
+      },
+      "workflowSessionId": "retry-after-partial-failure_1779203722946_82drhw",
+      "retryChainId": "retry_1779203722952_inecsq",
+      "attemptNumber": 2,
+      "actionSource": "api",
+      "metadata": {
+        "workflowSessionId": "retry-after-partial-failure_1779203722946_82drhw",
+        "retryChainId": "retry_1779203722952_inecsq",
+        "attemptNumber": 2,
+        "actionSource": "api",
+        "metadata": {
+          "stage": "retry",
+          "success": true
+        }
+      }
+    },
+    {
+      "eventId": "evt_000077",
+      "sequence": 77,
+      "timestamp": "2026-05-19T15:15:25.380Z",
+      "actionType": "update",
+      "entityName": "messages",
+      "affectedRecordId": "msg_456",
+      "preStateSnapshotId": "evt_000076",
+      "postStateSnapshotId": "evt_000077",
+      "mutationPayload": {
+        "recordId": "msg_456",
+        "changes": {
+          "text": "Retry completed message",
+          "status": "confirmed"
+        },
+        "mode": "patch"
+      },
+      "workflowSessionId": "retry-after-partial-failure_1779203722946_82drhw",
+      "retryChainId": "retry_1779203722952_inecsq",
+      "attemptNumber": 2,
+      "actionSource": "api",
+      "metadata": {
+        "workflowSessionId": "retry-after-partial-failure_1779203722946_82drhw",
+        "retryChainId": "retry_1779203722952_inecsq",
+        "attemptNumber": 2,
+        "actionSource": "api",
+        "metadata": {
+          "retry": true
+        }
+      }
+    },
+    {
+      "eventId": "evt_000078",
+      "sequence": 78,
+      "timestamp": "2026-05-19T15:15:25.385Z",
+      "actionType": "workflow_end",
+      "entityName": "workflow",
+      "affectedRecordId": "retry-after-partial-failure_1779203722946_82drhw",
+      "preStateSnapshotId": "evt_000077",
+      "postStateSnapshotId": "evt_000078",
+      "mutationPayload": {
+        "workflowSessionId": "retry-after-partial-failure_1779203722946_82drhw",
+        "workflowName": "retry after partial failure"
+      },
+      "workflowSessionId": "retry-after-partial-failure_1779203722946_82drhw",
+      "actionSource": "simulated-agent",
+      "metadata": {
+        "actionSource": "simulated-agent"
+      }
+    },
+    {
+      "eventId": "evt_000079",
+      "sequence": 79,
+      "timestamp": "2026-05-19T15:15:31.540Z",
+      "actionType": "workflow_start",
+      "entityName": "workflow",
+      "affectedRecordId": "concurrent-update-conflict_1779203731536_icd9xg",
+      "preStateSnapshotId": "default",
+      "postStateSnapshotId": "evt_000079",
+      "mutationPayload": {
+        "workflowSessionId": "concurrent-update-conflict_1779203731536_icd9xg",
+        "workflowName": "concurrent update conflict"
+      },
+      "workflowSessionId": "concurrent-update-conflict_1779203731536_icd9xg",
+      "actionSource": "simulated-agent",
+      "metadata": {
+        "actionSource": "simulated-agent"
+      }
+    },
+    {
+      "eventId": "evt_000080",
+      "sequence": 80,
+      "timestamp": "2026-05-19T15:15:32.750Z",
+      "actionType": "update",
+      "entityName": "users",
+      "affectedRecordId": "user_123",
+      "preStateSnapshotId": "stale-read",
+      "postStateSnapshotId": "evt_000080",
+      "mutationPayload": {
+        "recordId": "user_123",
+        "changes": {
+          "name": "John Doe (fresh)"
+        },
+        "mode": "patch"
+      },
+      "workflowSessionId": "concurrent-update-conflict_1779203731536_icd9xg",
+      "actionSource": "api",
+      "metadata": {
+        "workflowSessionId": "concurrent-update-conflict_1779203731536_icd9xg",
+        "actionSource": "api",
+        "preStateSnapshotId": "stale-read",
+        "metadata": {
+          "client": "client-a",
+          "readVersion": 1777659912593
+        }
+      }
+    },
+    {
+      "eventId": "evt_000081",
+      "sequence": 81,
+      "timestamp": "2026-05-19T15:15:33.961Z",
+      "actionType": "conflict",
+      "entityName": "users",
+      "affectedRecordId": "user_123",
+      "preStateSnapshotId": "evt_000080",
+      "postStateSnapshotId": "evt_000081",
+      "mutationPayload": {
+        "recordId": "user_123",
+        "stalePayload": {
+          "_id": "user_123",
+          "_creationTime": 1777659912593,
+          "name": "John Doe (stale)",
+          "email": "john@example.com"
+        },
+        "reason": "stale_write"
+      },
+      "workflowSessionId": "concurrent-update-conflict_1779203731536_icd9xg",
+      "actionSource": "api",
+      "metadata": {
+        "workflowSessionId": "concurrent-update-conflict_1779203731536_icd9xg",
+        "actionSource": "api",
+        "reason": "stale_write",
+        "metadata": {
+          "client": "client-b",
+          "observedName": "John Doe",
+          "latestName": "John Doe (fresh)"
+        }
+      }
+    },
+    {
+      "eventId": "evt_000082",
+      "sequence": 82,
+      "timestamp": "2026-05-19T15:15:33.970Z",
+      "actionType": "update",
+      "entityName": "users",
+      "affectedRecordId": "user_123",
+      "preStateSnapshotId": "evt_000081",
+      "postStateSnapshotId": "evt_000082",
+      "mutationPayload": {
+        "recordId": "user_123",
+        "changes": {
+          "_id": "user_123",
+          "_creationTime": 1777659912593,
+          "name": "John Doe (stale)",
+          "email": "john@example.com"
+        },
+        "mode": "patch"
+      },
+      "workflowSessionId": "concurrent-update-conflict_1779203731536_icd9xg",
+      "actionSource": "api",
+      "metadata": {
+        "workflowSessionId": "concurrent-update-conflict_1779203731536_icd9xg",
+        "actionSource": "api",
+        "metadata": {
+          "client": "client-b",
+          "stale": true,
+          "divergence": true
+        }
+      }
+    },
+    {
+      "eventId": "evt_000083",
+      "sequence": 83,
+      "timestamp": "2026-05-19T15:15:33.981Z",
+      "actionType": "workflow_end",
+      "entityName": "workflow",
+      "affectedRecordId": "concurrent-update-conflict_1779203731536_icd9xg",
+      "preStateSnapshotId": "evt_000082",
+      "postStateSnapshotId": "evt_000083",
+      "mutationPayload": {
+        "workflowSessionId": "concurrent-update-conflict_1779203731536_icd9xg",
+        "workflowName": "concurrent update conflict"
+      },
+      "workflowSessionId": "concurrent-update-conflict_1779203731536_icd9xg",
+      "actionSource": "simulated-agent",
+      "metadata": {
+        "actionSource": "simulated-agent"
+      }
+    },
+    {
+      "eventId": "evt_000084",
+      "sequence": 84,
+      "timestamp": "2026-05-19T15:15:59.799Z",
+      "actionType": "workflow_start",
+      "entityName": "workflow",
+      "affectedRecordId": "concurrent-update-conflict_1779203759797_trct74",
+      "preStateSnapshotId": "default",
+      "postStateSnapshotId": "evt_000084",
+      "mutationPayload": {
+        "workflowSessionId": "concurrent-update-conflict_1779203759797_trct74",
+        "workflowName": "concurrent update conflict"
+      },
+      "workflowSessionId": "concurrent-update-conflict_1779203759797_trct74",
+      "actionSource": "simulated-agent",
+      "metadata": {
+        "actionSource": "simulated-agent"
+      }
+    },
+    {
+      "eventId": "evt_000085",
+      "sequence": 85,
+      "timestamp": "2026-05-19T15:16:01.007Z",
+      "actionType": "update",
+      "entityName": "users",
+      "affectedRecordId": "user_123",
+      "preStateSnapshotId": "stale-read",
+      "postStateSnapshotId": "evt_000085",
+      "mutationPayload": {
+        "recordId": "user_123",
+        "changes": {
+          "name": "John Doe (fresh)"
+        },
+        "mode": "patch"
+      },
+      "workflowSessionId": "concurrent-update-conflict_1779203759797_trct74",
+      "actionSource": "api",
+      "metadata": {
+        "workflowSessionId": "concurrent-update-conflict_1779203759797_trct74",
+        "actionSource": "api",
+        "preStateSnapshotId": "stale-read",
+        "metadata": {
+          "client": "client-a",
+          "readVersion": 1777659912593
+        }
+      }
+    },
+    {
+      "eventId": "evt_000086",
+      "sequence": 86,
+      "timestamp": "2026-05-19T15:16:02.216Z",
+      "actionType": "conflict",
+      "entityName": "users",
+      "affectedRecordId": "user_123",
+      "preStateSnapshotId": "evt_000085",
+      "postStateSnapshotId": "evt_000086",
+      "mutationPayload": {
+        "recordId": "user_123",
+        "stalePayload": {
+          "_id": "user_123",
+          "_creationTime": 1777659912593,
+          "name": "John Doe (stale)",
+          "email": "john@example.com"
+        },
+        "reason": "stale_write"
+      },
+      "workflowSessionId": "concurrent-update-conflict_1779203759797_trct74",
+      "actionSource": "api",
+      "metadata": {
+        "workflowSessionId": "concurrent-update-conflict_1779203759797_trct74",
+        "actionSource": "api",
+        "reason": "stale_write",
+        "metadata": {
+          "client": "client-b",
+          "observedName": "John Doe",
+          "latestName": "John Doe (fresh)"
+        }
+      }
+    },
+    {
+      "eventId": "evt_000087",
+      "sequence": 87,
+      "timestamp": "2026-05-19T15:16:02.223Z",
+      "actionType": "update",
+      "entityName": "users",
+      "affectedRecordId": "user_123",
+      "preStateSnapshotId": "evt_000086",
+      "postStateSnapshotId": "evt_000087",
+      "mutationPayload": {
+        "recordId": "user_123",
+        "changes": {
+          "_id": "user_123",
+          "_creationTime": 1777659912593,
+          "name": "John Doe (stale)",
+          "email": "john@example.com"
+        },
+        "mode": "patch"
+      },
+      "workflowSessionId": "concurrent-update-conflict_1779203759797_trct74",
+      "actionSource": "api",
+      "metadata": {
+        "workflowSessionId": "concurrent-update-conflict_1779203759797_trct74",
+        "actionSource": "api",
+        "metadata": {
+          "client": "client-b",
+          "stale": true,
+          "divergence": true
+        }
+      }
+    },
+    {
+      "eventId": "evt_000088",
+      "sequence": 88,
+      "timestamp": "2026-05-19T15:16:02.230Z",
+      "actionType": "workflow_end",
+      "entityName": "workflow",
+      "affectedRecordId": "concurrent-update-conflict_1779203759797_trct74",
+      "preStateSnapshotId": "evt_000087",
+      "postStateSnapshotId": "evt_000088",
+      "mutationPayload": {
+        "workflowSessionId": "concurrent-update-conflict_1779203759797_trct74",
+        "workflowName": "concurrent update conflict"
+      },
+      "workflowSessionId": "concurrent-update-conflict_1779203759797_trct74",
+      "actionSource": "simulated-agent",
+      "metadata": {
+        "actionSource": "simulated-agent"
       }
     }
   ]
